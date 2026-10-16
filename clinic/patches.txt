@@ -1,0 +1,5 @@
+[pre_model_sync]
+clinic.patches.create_clinic_roles
+
+[post_model_sync]
+clinic.patches.seed_clinic_masters

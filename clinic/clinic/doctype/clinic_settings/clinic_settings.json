@@ -1,0 +1,171 @@
+{
+	"actions": [],
+	"creation": "2026-10-12 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"clinic_name",
+		"company_name",
+		"column_1",
+		"licence_no",
+		"website",
+		"section_2",
+		"po_box",
+		"head_office",
+		"farm_location",
+		"column_3",
+		"phone",
+		"email",
+		"section_4",
+		"report_footer_note"
+	],
+	"fields": [
+		{
+			"fieldname": "clinic_name",
+			"fieldtype": "Data",
+			"label": "Clinic Name",
+			"reqd": 1,
+			"default": "Mutara Orchards Clinic"
+		},
+		{
+			"fieldname": "company_name",
+			"fieldtype": "Data",
+			"label": "Company Name",
+			"reqd": 1,
+			"default": "Mutara Orchards Ltd."
+		},
+		{
+			"fieldname": "column_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "licence_no",
+			"fieldtype": "Data",
+			"label": "Clinic Registration / Licence No."
+		},
+		{
+			"fieldname": "website",
+			"fieldtype": "Data",
+			"label": "Website",
+			"default": "www.mutara.ke"
+		},
+		{
+			"fieldname": "section_2",
+			"fieldtype": "Section Break",
+			"label": "Letterhead"
+		},
+		{
+			"fieldname": "po_box",
+			"fieldtype": "Data",
+			"label": "P.O. Box",
+			"default": "P.O. Box 51027 \u2013 00200"
+		},
+		{
+			"fieldname": "head_office",
+			"fieldtype": "Data",
+			"label": "Head Office",
+			"default": "105 Manyani East Road, Lavington"
+		},
+		{
+			"fieldname": "farm_location",
+			"fieldtype": "Data",
+			"label": "Farm Location",
+			"default": "Nanyuki \u2013 Rumuruti Road, Laikipia"
+		},
+		{
+			"fieldname": "column_3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "phone",
+			"fieldtype": "Data",
+			"label": "Phone"
+		},
+		{
+			"fieldname": "email",
+			"fieldtype": "Data",
+			"label": "Email",
+			"options": "Email",
+			"default": "hello@mutara.ke"
+		},
+		{
+			"fieldname": "section_4",
+			"fieldtype": "Section Break",
+			"label": "Printed documents"
+		},
+		{
+			"fieldname": "report_footer_note",
+			"fieldtype": "Small Text",
+			"label": "Footer Note",
+			"default": "This document contains confidential medical information intended only for the named recipient."
+		}
+	],
+	"links": [],
+	"modified": "2026-10-12 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Settings",
+	"owner": "Administrator",
+	"states": [],
+	"issingle": 1,
+	"permissions": [
+		{
+			"role": "System Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1,
+			"write": 1
+		},
+		{
+			"role": "Clinic Receptionist",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Pharmacist",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		}
+	]
+}

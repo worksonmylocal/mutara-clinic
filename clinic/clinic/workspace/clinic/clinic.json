@@ -1,0 +1,89 @@
+{
+ "app": "clinic",
+ "charts": [],
+ "content": "[{\"id\": \"hdr1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Clinic Desks</b></span>\", \"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Triage Desk\", \"col\": 4}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Doctor Desk\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pharmacy Desk\", \"col\": 4}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Patient Journey</b></span>\", \"col\": 12}}, {\"id\": \"pj0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Patient\", \"col\": 3}}, {\"id\": \"pj1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Visit\", \"col\": 3}}, {\"id\": \"pj2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Consultation\", \"col\": 3}}, {\"id\": \"pj3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dispensing\", \"col\": 3}}, {\"id\": \"pj4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Appointment\", \"col\": 3}}]",
+ "creation": "2026-09-29 19:48:54.784253",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "health",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Clinic",
+ "links": [],
+ "modified": "2026-10-07 10:47:58.659093",
+ "modified_by": "Administrator",
+ "module": "Clinic",
+ "name": "Clinic",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [],
+ "sequence_id": 50.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Triage Desk",
+   "type": "URL",
+   "url": "/clinic/triage"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Doctor Desk",
+   "type": "URL",
+   "url": "/clinic/consultation"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Pharmacy Desk",
+   "type": "URL",
+   "url": "/clinic/pharmacy"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Patient",
+   "link_to": "Clinic Patient",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Visit",
+   "link_to": "Clinic Visit",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Consultation",
+   "link_to": "Clinic Consultation",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Dispensing",
+   "link_to": "Clinic Dispensing",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Appointment",
+   "link_to": "Clinic Appointment",
+   "type": "DocType"
+  }
+ ],
+ "title": "Clinic",
+ "type": "Workspace"
+}

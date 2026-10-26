@@ -9,6 +9,7 @@
 		"column_1",
 		"licence_no",
 		"website",
+		"drug_item_group",
 		"section_2",
 		"po_box",
 		"head_office",
@@ -98,6 +99,14 @@
 			"fieldtype": "Small Text",
 			"label": "Footer Note",
 			"default": "This document contains confidential medical information intended only for the named recipient."
+		},
+		{
+			"fieldname": "drug_item_group",
+			"fieldtype": "Link",
+			"label": "Drug Item Group",
+			"options": "Item Group",
+			"default": "Clinic Drugs",
+			"description": "Only items in this group (and its sub-groups) appear when prescribing."
 		}
 	],
 	"links": [],

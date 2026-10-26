@@ -326,13 +326,23 @@ def action(name, action, data=None):
 	}
 
 
+def drug_groups():
+	"""The drug item group from Clinic Settings, with every sub-group under it."""
+	group = frappe.db.get_single_value("Clinic Settings", "drug_item_group") or "Clinic Drugs"
+	bounds = frappe.db.get_value("Item Group", group, ["lft", "rgt"])
+	if not bounds:
+		return [group]
+	return frappe.get_all("Item Group", filters={"lft": [">=", bounds[0]], "rgt": ["<=", bounds[1]]}, pluck="name")
+
+
 @frappe.whitelist()
 def search_drugs(q=""):
+	"""Only items in the clinic's drug group, so farm store items never show up when prescribing."""
 	require("consultation")
 	like = f"%{(q or '').strip()}%"
 	return frappe.get_all(
 		"Item",
-		filters={"disabled": 0},
+		filters={"disabled": 0, "item_group": ["in", drug_groups()]},
 		or_filters=[["item_name", "like", like], ["item_code", "like", like]],
 		fields=["name", "item_name", "stock_uom", "item_group"],
 		order_by="item_name asc",
@@ -358,10 +368,11 @@ def add_drug(drug_name):
 	existing = frappe.db.get_value("Item", {"item_name": drug_name}, "name")
 	if existing:
 		return frappe.db.get_value("Item", existing, ["name", "item_name", "stock_uom", "item_group"], as_dict=True)
-	group = next(
-		(g for g in ("Drug", "Medicine", "Pharmaceutical", "Consumable") if frappe.db.exists("Item Group", g)),
-		frappe.db.get_value("Item Group", {"is_group": 0}),
-	)
+	group = frappe.db.get_single_value("Clinic Settings", "drug_item_group") or "Clinic Drugs"
+	if not frappe.db.exists("Item Group", group):
+		frappe.get_doc(
+			{"doctype": "Item Group", "item_group_name": group, "parent_item_group": "All Item Groups"}
+		).insert(ignore_permissions=True)
 	item = frappe.get_doc(
 		{
 			"doctype": "Item",

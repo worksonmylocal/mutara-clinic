@@ -1,6 +1,6 @@
 import frappe
 
-from clinic.seed_data import DIAGNOSES, INVESTIGATIONS
+from clinic.seed_data import DIAGNOSES, DRUG_ITEM_GROUP, DRUGS, INVESTIGATIONS
 
 ROLES = [
 	"Clinic Receptionist",
@@ -42,6 +42,28 @@ def seed_diagnoses():
 		).insert(ignore_permissions=True)
 
 
+def seed_drugs():
+	"""The clinic's drug item group and a starting list of drugs (ERPNext Items)."""
+	if not frappe.db.exists("Item Group", DRUG_ITEM_GROUP):
+		frappe.get_doc(
+			{"doctype": "Item Group", "item_group_name": DRUG_ITEM_GROUP, "parent_item_group": "All Item Groups"}
+		).insert(ignore_permissions=True)
+	for name in DRUGS:
+		if frappe.db.exists("Item", {"item_name": name}):
+			continue
+		frappe.get_doc(
+			{
+				"doctype": "Item",
+				"item_code": name,
+				"item_name": name,
+				"item_group": DRUG_ITEM_GROUP,
+				"stock_uom": "Nos",
+				"is_stock_item": 1,
+				"description": "Clinic drug",
+			}
+		).insert(ignore_permissions=True)
+
+
 def before_install():
 	ensure_roles()
 
@@ -50,3 +72,4 @@ def after_install():
 	ensure_roles()
 	seed_investigations()
 	seed_diagnoses()
+	seed_drugs()

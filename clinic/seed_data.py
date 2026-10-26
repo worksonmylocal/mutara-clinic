@@ -115,3 +115,19 @@ MEDICAL_EXAM_TESTS = [
 	"Hernia",
 	"Urinalysis (dipstick)",
 ]
+
+
+# Starting drug list (ERPNext Items in the clinic's drug item group). Add more under Stock > Item.
+DRUG_ITEM_GROUP = "Clinic Drugs"
+DRUGS = [
+	"Paracetamol 500mg Tablets",
+	"Amoxicillin 500mg Capsules",
+	"Ibuprofen 400mg Tablets",
+	"Diclofenac 50mg Tablets",
+	"Metronidazole 400mg Tablets",
+	"Cotrimoxazole 480mg Tablets",
+	"Artemether/Lumefantrine 20/120mg Tablets",
+	"Loratadine 10mg Tablets",
+	"Omeprazole 20mg Capsules",
+	"Oral Rehydration Salts Sachets",
+]

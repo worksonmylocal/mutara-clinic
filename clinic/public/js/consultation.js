@@ -29,7 +29,7 @@
     function renderKpis(k) {
         kpis($("#kpis"), [
             { label: "Waiting for Doctor", value: k.waiting, cls: k.waiting ? "warn" : "", unit: k.emergency ? `${k.emergency} urgent / emergency` : k.waiting ? `Longest wait ${Desk.duration(k.longest_wait)}` : "Queue is clear" },
-            { label: "Employment Medicals", value: k.medicals_today, cls: k.medicals_today ? "info" : "", unit: "Pre / post-employment, today" },
+            { label: "Results to Review", value: k.results_pending, cls: k.results_received ? "info" : "", unit: k.results_pending ? `${k.results_received} result${k.results_received === 1 ? "" : "s"} received` : "No investigations out" },
             { label: "Open Consultations", value: k.in_progress, unit: "In progress now" },
             { label: "Seen Today", value: k.seen_today, cls: "good", unit: `${Desk.split(k.employees_today)}` },
             { label: "Avg Wait for Doctor", value: `${k.avg_wait}<span style="font-size:14px;font-weight:500"> min</span>`, unit: "Triage → consultation, today" },
@@ -53,6 +53,19 @@
         $("#waiting").innerHTML = d.waiting.length
             ? d.waiting.map((r) => queueCard(r, `<button class="btn btn--primary btn--sm" data-open="${esc(r.visit)}">Start consultation</button>`)).join("")
             : empty("No patients waiting.");
+
+        $("#results-meta").textContent = d.results.length ? `${d.results.length} patient${d.results.length === 1 ? "" : "s"}` : "";
+        $("#results").innerHTML = d.results.length
+            ? d.results.map((r) => `<div class="qcard"><div class="qcard__stripe ${r.abnormal ? "Emergency" : r.received ? "Urgent" : ""}"></div>
+                <div><div class="qcard__name">${esc(r.patient_name)} ${typeTag(r.patient_type)}
+                    ${r.received ? pill(`${r.received} result${r.received === 1 ? "" : "s"} in`, "info") : pill("Awaiting results", "mute")}
+                    ${r.abnormal ? pill("Abnormal", "bad") : ""}</div>
+                <div class="qcard__meta">${esc(r.visit)} · ${esc(ageSex(r))} · referred ${esc(dateOf(r.since).slice(5))}</div>
+                <div class="qcard__note">${r.tests.map((t) => `${esc(t.investigation)} <span style="color:${t.result_status === "Results Received" ? "var(--info)" : "var(--ink-mute)"}">(${t.category === "Imaging" ? "imaging" : "lab"}${t.result_status === "Results Received" ? ", received" : ""})</span>`).join(" · ")}</div></div>
+                <div class="qcard__side">${wait(r.wait_minutes, 1440, 4320)}
+                    <button class="btn ${r.received ? "btn--signal" : ""} btn--sm" data-review="${esc(r.visit)}">Review results</button></div></div>`).join("")
+            : empty("No investigations awaiting results.");
+        $$("[data-review]").forEach((b) => b.addEventListener("click", () => openVisit(b.dataset.review, "review")));
 
         $("#progress").innerHTML = d.in_progress.length
             ? d.in_progress.map((r) => queueCard(r, `<button class="btn btn--sm" data-open="${esc(r.visit)}">Continue</button>`)).join("")
@@ -109,13 +122,14 @@
     }
 
     // ============================================================ routing
-    async function openVisit(visit) {
+    async function openVisit(visit, tab) {
         let data = await call("consultation.workspace", { visit });
         if (!data.consultation) {
             await call("consultation.start", { visit });
             data = await call("consultation.workspace", { visit });
         }
         renderWorkspace(data);
+        if (tab) { const t = $(`.subtab[data-p=${tab}]`); if (t) t.click(); }
         location.hash = "#/" + visit; // hashchange sees the workspace is already showing and ignores it
     }
 
@@ -148,7 +162,10 @@
         ws = data;
         const c = ws.consultation, p = ws.patient, t = ws.triage, v = ws.visit;
         const isEmp = p.patient_type === "Employee";
-        const locked = c.status === "Completed";
+        const pending = (c.investigations || []).some((r) => (r.result_status || "Awaiting Results") !== "Reviewed");
+        const locked = c.status === "Completed" && !pending; // a completed consultation stays editable until its results are reviewed
+        const reviewing = c.status === "Completed" && pending;
+        ws.locked = locked;
         const medical = isMedical();
         state = {
             inv: (c.investigations || []).map((r) => ({ ...r })),
@@ -186,6 +203,7 @@
             ${banner(p, { visit: v.name })}
             ${v.visit_source === "Referral In" ? `<div class="liveinfo" style="background:var(--info-bg);color:var(--info)">Referred in from <b>${esc(v.referring_facility || "another facility")}</b>${v.referring_clinician ? " by " + esc(v.referring_clinician) : ""}${v.referral_reason ? " — " + esc(v.referral_reason) : ""}${v.referral_letter ? ` · <a href="${esc(v.referral_letter)}" target="_blank" style="text-decoration:underline">referral letter</a>` : ""}</div>` : ""}
             ${locked ? '<div class="liveinfo ok">This consultation is completed and read-only. You can still print its referrals and certificates.</div>' : ""}
+            ${reviewing ? '<div class="liveinfo" style="background:var(--info-bg);color:var(--info)">Reviewing investigation results. Use the <b>Review Results</b> tab; everything else on this consultation can still be edited.</div>' : ""}
             <div class="ws">
                 <div class="card" id="ws-form">
                     <div class="subtabs" id="subtabs">
@@ -196,6 +214,7 @@
                         <button class="subtab" data-p="dx">Diagnosis <span class="dotc" id="c-dx" style="display:none"></span></button>
                         <button class="subtab" data-p="plan">Plan | Treatment <span class="dotc" id="c-inv" style="display:none"></span></button>
                         <button class="subtab" data-p="rx">Prescriptions <span class="dotc" id="c-rx" style="display:none"></span></button>
+                        <button class="subtab" data-p="review">Review Results <span class="dotc" id="c-rev" style="display:none"></span></button>
                     </div>
                     <fieldset id="fs" style="border:0;padding:0;margin:0;min-width:0" ${locked ? "disabled" : ""}>
                     <div class="subpanel on" id="sp-bio">
@@ -312,6 +331,11 @@
                             ${field("sick_leave_days", "Sick-off days recommended", { type: "number", value: c.sick_leave_days || "", attrs: 'min="0"' })}
                             ${field("light_duty_days", "Light duty days", { type: "number", value: c.light_duty_days || "", attrs: 'min="0"' })}</div>` : ""}
                     </div>
+                    <div class="subpanel" id="sp-review">
+                        <div class="printnote" style="margin-bottom:12px">Record what came back from the laboratory or imaging centre, then mark each investigation as reviewed. Pressing <b>Save review ✓</b> marks every investigation as reviewed and removes the patient from the “Awaiting Results” list.</div>
+                        <div id="rev-rows"></div>
+                        ${ta("results_review_notes", "Doctor's review of the results", 4, { placeholder: "Interpretation, decisions made, changes to treatment…" })}
+                    </div>
                     <div class="subpanel" id="sp-rx">
                         <div id="rx-allergy"></div>
                         ${locked ? "" : `<div class="field"><input class="input" id="rx-add" placeholder="Search a medicine to prescribe…"></div>`}
@@ -353,7 +377,7 @@
         $("[data-f=refer_out]", root).addEventListener("change", (e) => ($("#ref-box", root).style.display = e.target.checked ? "block" : "none"));
         $("[data-f=follow_up_required]", root).addEventListener("change", (e) => ($("#fu-box", root).style.display = e.target.checked ? "block" : "none"));
 
-        renderInv(); renderDx(); renderRx(); renderMed();
+        renderInv(); renderDx(); renderRx(); renderMed(); renderReview();
         renderTimeline(ws.history);
         $("#tl-all", root).addEventListener("click", async () => renderTimeline(await call("consultation.patient_timeline", { patient: ws.patient.name })));
         $("#print-Laboratory", root).addEventListener("click", () => printReferral("Laboratory"));
@@ -433,8 +457,8 @@
     // ---- investigations
     function addInv(t) {
         if (state.inv.some((r) => r.investigation === t.name)) return toast(`${t.name} is already requested`, "warn");
-        state.inv.push({ investigation: t.name, category: t.category, urgency: "Routine", clinical_notes: "" });
-        dirty = true; renderInv();
+        state.inv.push({ investigation: t.name, category: t.category, urgency: "Routine", clinical_notes: "", result_status: "Awaiting Results" });
+        dirty = true; renderInv(); renderReview();
     }
     function renderInv() {
         const el = $("#inv-rows");
@@ -445,9 +469,59 @@
                 <button class="iconx" data-inv-del="${i}" title="Remove">×</button></div></div>
             <input class="input" style="margin-top:10px" placeholder="Clinical notes / reason for the test (optional)" data-inv="${i}" data-k="clinical_notes" value="${esc(r.clinical_notes || "")}"></div>`).join("") : empty("No investigations requested.");
         $$("[data-inv]", el).forEach((inp) => inp.addEventListener("input", () => (state.inv[inp.dataset.inv][inp.dataset.k] = inp.value)));
-        $$("[data-inv-del]", el).forEach((b) => b.addEventListener("click", () => { state.inv.splice(Number(b.dataset.invDel), 1); dirty = true; renderInv(); }));
+        $$("[data-inv-del]", el).forEach((b) => b.addEventListener("click", () => { state.inv.splice(Number(b.dataset.invDel), 1); dirty = true; renderInv(); renderReview(); }));
         const n = state.inv.length; $("#c-inv").style.display = n ? "" : "none"; $("#c-inv").textContent = n;
         if (locked()) $$("#inv-rows input,#inv-rows select,#inv-rows button").forEach((x) => (x.disabled = true));
+    }
+
+    // ---- review of investigation results
+    const RES_STATUS = ["Awaiting Results", "Results Received", "Reviewed"];
+    function renderReview() {
+        const el = $("#rev-rows");
+        const pendingCount = state.inv.filter((r) => (r.result_status || "Awaiting Results") !== "Reviewed").length;
+        const dot = $("#c-rev"); dot.style.display = pendingCount ? "" : "none"; dot.textContent = pendingCount;
+        el.innerHTML = state.inv.length ? state.inv.map((r, i) => {
+            const st = r.result_status || "Awaiting Results";
+            const flagCls = { Normal: "good", Abnormal: "bad", Critical: "bad" }[r.result_flag] || "mute";
+            return `<div class="linebox"><div class="linebox__row">
+                <div><b style="color:var(--ink)">${esc(r.investigation)}</b> ${pill(r.category || catOf(r.investigation), (r.category || catOf(r.investigation)) === "Imaging" ? "info" : "mute")}
+                    ${r.result_flag ? pill(r.result_flag, flagCls) : ""}</div>
+                <select class="input" style="width:170px;padding:6px 10px" data-rev="${i}" data-k="result_status">${RES_STATUS.map((o) => `<option ${o === st ? "selected" : ""}>${o}</option>`).join("")}</select></div>
+                <div class="grid-3" style="margin-top:10px">
+                    <div class="field"><label>Result date</label><input type="date" data-rev="${i}" data-k="result_date" value="${esc(r.result_date || "")}"></div>
+                    <div class="field"><label>Result</label><select data-rev="${i}" data-k="result_flag">${["", "Normal", "Abnormal", "Critical"].map((o) => `<option ${o === (r.result_flag || "") ? "selected" : ""}>${o}</option>`).join("")}</select></div>
+                    <div class="field"><label>Report / image</label>
+                        ${r.result_attachment ? `<div><a href="${esc(r.result_attachment)}" target="_blank" class="btn btn--sm">Open report</a> <button class="btn btn--link btn--sm" data-rev-clear="${i}" type="button">Remove</button></div>`
+                            : `<input type="file" data-rev-file="${i}" accept="image/*,application/pdf">`}</div>
+                </div>
+                <div class="grid-2">
+                    <div class="field"><label>${(r.category || catOf(r.investigation)) === "Imaging" ? "Findings" : "Values / findings"}</label><textarea rows="3" data-rev="${i}" data-k="result_findings" placeholder="${(r.category || catOf(r.investigation)) === "Imaging" ? "Radiologist's findings" : "e.g. Hb 13.2 g/dL, WBC 7.1"}">${esc(r.result_findings || "")}</textarea></div>
+                    <div class="field"><label>Impression / interpretation</label><textarea rows="3" data-rev="${i}" data-k="result_impression">${esc(r.result_impression || "")}</textarea></div>
+                </div></div>`;
+        }).join("") : empty("No investigations were requested on this consultation.");
+        $$("[data-rev]", el).forEach((inp) => inp.addEventListener("change", () => {
+            const row = state.inv[inp.dataset.rev], k = inp.dataset.k;
+            row[k] = inp.value;
+            if (k === "result_flag" && inp.value && row.result_status === "Awaiting Results") row.result_status = "Results Received";
+            if (k === "result_status" && inp.value !== "Awaiting Results" && !row.result_date) row.result_date = new Date().toISOString().slice(0, 10);
+            dirty = true; renderReview();
+        }));
+        $$("[data-rev-clear]", el).forEach((b) => b.addEventListener("click", () => { state.inv[b.dataset.revClear].result_attachment = ""; dirty = true; renderReview(); }));
+        $$("[data-rev-file]", el).forEach((inp) => inp.addEventListener("change", async () => {
+            const file = inp.files[0]; if (!file) return;
+            const fd = new FormData(); fd.append("file", file, file.name); fd.append("is_private", "1");
+            try {
+                const res = await fetch("/api/method/upload_file", { method: "POST", body: fd, credentials: "same-origin", headers: { "X-Frappe-CSRF-Token": Desk.cfg.csrf } });
+                const data = await res.json();
+                if (!res.ok) throw new Error("upload failed");
+                const row = state.inv[inp.dataset.revFile];
+                row.result_attachment = data.message.file_url;
+                if (row.result_status === "Awaiting Results") row.result_status = "Results Received";
+                if (!row.result_date) row.result_date = new Date().toISOString().slice(0, 10);
+                dirty = true; renderReview(); toast("Report uploaded");
+            } catch (e) { toast("The report could not be uploaded", "error"); }
+        }));
+        if (locked()) $$("#rev-rows input,#rev-rows select,#rev-rows textarea,#rev-rows button").forEach((x) => (x.disabled = true));
     }
 
     // ---- employment medical examinations
@@ -527,7 +601,7 @@
         if (locked()) $$("#rx-rows input,#rx-rows select,#rx-rows button").forEach((x) => (x.disabled = true));
     }
 
-    const locked = () => ws.consultation.status === "Completed";
+    const locked = () => !!ws.locked;
 
     // ---- timeline
     function renderTimeline(rows) {
@@ -551,12 +625,24 @@
     function refreshActions() {
         const box = $("#actions");
         if (locked()) { box.innerHTML = ""; return; }
+        const done = ws.consultation.status === "Completed"; // reviewing results
         const hasRx = state.rx.length > 0;
-        box.innerHTML = hasRx
-            ? '<button class="btn btn--primary" id="a-rx">Send to Pharmacy →</button>'
-            : '<button class="btn btn--primary" id="a-done">Complete consultation ✓</button>';
+        const canSend = hasRx && (!done || !ws.consultation.dispensing);
+        box.innerHTML = done
+            ? `${canSend ? '<button class="btn" id="a-rx">Send to Pharmacy →</button>' : ""}<button class="btn btn--primary" id="a-review">Save review ✓</button>`
+            : hasRx
+                ? '<button class="btn btn--primary" id="a-rx">Send to Pharmacy →</button>'
+                : '<button class="btn btn--primary" id="a-done">Complete consultation ✓</button>';
         $("#a-rx")?.addEventListener("click", () => act("send_to_pharmacy", "Sent to the pharmacy"));
         $("#a-done")?.addEventListener("click", () => act("complete", "Consultation completed"));
+        $("#a-review")?.addEventListener("click", async () => {
+            const btn = $("#a-review"); btn.disabled = true;
+            // saving the review closes it: every investigation moves to Reviewed
+            const today = new Date().toISOString().slice(0, 10);
+            state.inv.forEach((r) => { r.result_status = "Reviewed"; if (!r.result_date && (r.result_findings || r.result_impression || r.result_flag || r.result_attachment)) r.result_date = today; });
+            try { await save(false); toast("Review saved. Results marked as reviewed."); history.replaceState(null, "", location.pathname); showQueue(); }
+            catch (e) { btn.disabled = false; }
+        });
     }
 
     function collect() {
@@ -565,8 +651,9 @@
         // unchecked/absent boxes come through as 0; empty date strings are cleaned server side
         const fac = { Laboratory: data.fac_Laboratory || null, Imaging: data.fac_Imaging || null };
         delete data.fac_Laboratory; delete data.fac_Imaging;
-        data.investigations = state.inv.map(({ investigation, category, urgency, clinical_notes }) => ({
+        data.investigations = state.inv.map(({ investigation, category, urgency, clinical_notes, result_status, result_date, result_flag, result_findings, result_impression, result_attachment }) => ({
             investigation, urgency, clinical_notes, referred_to: fac[category || catOf(investigation)],
+            result_status, result_date, result_flag, result_findings, result_impression, result_attachment,
         }));
         data.diagnoses = state.dx.map(({ diagnosis, diagnosis_type, notes }) => ({ diagnosis, diagnosis_type, notes }));
         data.prescriptions = state.rx.map(({ drug, dose, route, frequency, duration_days, quantity, instructions }) => ({ drug, dose, route, frequency, duration_days, quantity, instructions }));

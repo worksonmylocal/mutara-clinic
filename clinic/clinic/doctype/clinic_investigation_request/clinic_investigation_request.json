@@ -8,7 +8,13 @@
 		"category",
 		"urgency",
 		"clinical_notes",
-		"referred_to"
+		"referred_to",
+		"result_status",
+		"result_date",
+		"result_flag",
+		"result_findings",
+		"result_impression",
+		"result_attachment"
 	],
 	"fields": [
 		{
@@ -46,6 +52,40 @@
 			"fieldtype": "Link",
 			"label": "Refer To",
 			"options": "Clinic Facility"
+		},
+		{
+			"fieldname": "result_status",
+			"fieldtype": "Select",
+			"label": "Result Status",
+			"options": "Awaiting Results\nResults Received\nReviewed",
+			"default": "Awaiting Results",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "result_date",
+			"fieldtype": "Date",
+			"label": "Result Date"
+		},
+		{
+			"fieldname": "result_flag",
+			"fieldtype": "Select",
+			"label": "Result",
+			"options": "\nNormal\nAbnormal\nCritical"
+		},
+		{
+			"fieldname": "result_findings",
+			"fieldtype": "Small Text",
+			"label": "Findings / Values"
+		},
+		{
+			"fieldname": "result_impression",
+			"fieldtype": "Small Text",
+			"label": "Impression / Interpretation"
+		},
+		{
+			"fieldname": "result_attachment",
+			"fieldtype": "Attach",
+			"label": "Report / Image"
 		}
 	],
 	"links": [],

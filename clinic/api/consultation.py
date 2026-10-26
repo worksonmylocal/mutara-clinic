@@ -21,7 +21,7 @@ TEXT_FIELDS = [
 	"family_history", "social_history", "occupational_history", "exam_general", "exam_cvs", "exam_rs",
 	"exam_abdomen", "exam_cns", "exam_ms", "exam_other", "job_position", "fitness_status",
 	"certificate_valid_until", "fitness_restrictions", "medical_remarks", "investigations_notes",
-	"management_plan", "procedures_done", "patient_advice", "referral_facility", "referral_urgency",
+	"management_plan", "results_review_notes", "procedures_done", "patient_advice", "referral_facility", "referral_urgency",
 	"referral_reason", "referral_notes", "follow_up_date", "follow_up_reason",
 ]
 CHECK_FIELDS = ["work_related", "refer_out", "follow_up_required"]
@@ -52,6 +52,29 @@ def dashboard():
 		fields=["name as visit", "patient_name", "patient_type", "status", "sex", "age_years"],
 		order_by="modified asc",
 	)
+
+	results = frappe.db.sql(
+		"""
+		SELECT c.name AS consultation, c.visit, c.patient_name, c.patient_type, c.sex, c.age_years,
+			c.consultation_date AS since,
+			SUM(r.result_status = 'Awaiting Results') AS awaiting,
+			SUM(r.result_status = 'Results Received') AS received,
+			SUM(r.result_flag IN ('Abnormal', 'Critical') AND r.result_status != 'Reviewed') AS abnormal,
+			GROUP_CONCAT(CONCAT_WS('|', r.investigation, IFNULL(r.category, ''), r.result_status) ORDER BY r.idx SEPARATOR '~~') AS tests
+		FROM `tabClinic Investigation Request` r
+		JOIN `tabClinic Consultation` c ON c.name = r.parent
+		JOIN `tabClinic Visit` v ON v.name = c.visit
+		WHERE c.status = 'Completed' AND v.status != 'Cancelled' AND r.result_status != 'Reviewed'
+		GROUP BY c.name
+		ORDER BY received DESC, c.consultation_date
+		""",
+		as_dict=True,
+	)
+	for row in results:
+		row.wait_minutes = minutes_since(row.since)
+		row.tests = [
+			dict(zip(("investigation", "category", "result_status"), t.split("|"))) for t in row.tests.split("~~")
+		]
 
 	completed = frappe.db.sql(
 		"""
@@ -95,6 +118,8 @@ def dashboard():
 			"emergency": sum(1 for r in waiting if r.priority in ("Emergency", "Urgent")),
 			"longest_wait": max((r.wait_minutes for r in waiting), default=0),
 			"in_progress": len(in_progress),
+			"results_pending": len(results),
+			"results_received": sum(1 for r in results if r.received),
 			"seen_today": today.seen,
 			"employees_today": today.employees,
 			"avg_wait": round(today.avg_wait or 0),
@@ -106,6 +131,7 @@ def dashboard():
 		},
 		"waiting": waiting,
 		"in_progress": in_progress,
+		"results": results,
 		"in_flight": in_flight,
 		"completed": completed,
 	}
@@ -260,7 +286,8 @@ def _apply(doc, data):
 		])
 	if "investigations" in data:
 		doc.set("investigations", [
-			pick(row, ["investigation", "urgency", "clinical_notes", "referred_to"])
+			pick(row, ["investigation", "urgency", "clinical_notes", "referred_to", "result_status", "result_date",
+				"result_flag", "result_findings", "result_impression", "result_attachment"])
 			for row in data["investigations"] if row.get("investigation")
 		])
 	if "medical_tests" in data:

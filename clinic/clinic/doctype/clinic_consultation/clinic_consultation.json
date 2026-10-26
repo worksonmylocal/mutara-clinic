@@ -90,6 +90,9 @@
 		"sick_leave_days",
 		"col_leave",
 		"light_duty_days",
+		"tab_review",
+		"investigation_results",
+		"results_review_notes",
 		"tab_rx",
 		"prescriptions",
 		"dispensing"
@@ -589,6 +592,22 @@
 			"label": "Dispensing",
 			"options": "Clinic Dispensing",
 			"read_only": 1
+		},
+		{
+			"fieldname": "tab_review",
+			"fieldtype": "Tab Break",
+			"label": "Review Results"
+		},
+		{
+			"fieldname": "investigation_results",
+			"fieldtype": "HTML",
+			"label": "Results",
+			"options": "<p class='text-muted'>Record each result in the investigation rows on the Plan | Treatment tab (Result Status, Result Date, Findings, Impression, Report).</p>"
+		},
+		{
+			"fieldname": "results_review_notes",
+			"fieldtype": "Text",
+			"label": "Doctor's Review of Results"
 		}
 	],
 	"links": [],

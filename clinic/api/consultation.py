@@ -4,6 +4,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cint, get_first_day, nowdate
 
+from clinic import stock
 from clinic.api.common import (
 	clean,
 	minutes_since,
@@ -340,7 +341,7 @@ def search_drugs(q=""):
 	"""Only items in the clinic's drug group, so farm store items never show up when prescribing."""
 	require("consultation")
 	like = f"%{(q or '').strip()}%"
-	return frappe.get_all(
+	items = frappe.get_all(
 		"Item",
 		filters={"disabled": 0, "item_group": ["in", drug_groups()]},
 		or_filters=[["item_name", "like", like], ["item_code", "like", like]],
@@ -348,6 +349,10 @@ def search_drugs(q=""):
 		order_by="item_name asc",
 		limit=15,
 	)
+	free = stock.available([i.name for i in items])
+	for item in items:
+		item.available = free.get(item.name, 0)
+	return items
 
 
 @frappe.whitelist()

@@ -10,6 +10,7 @@
 		"licence_no",
 		"website",
 		"drug_item_group",
+		"pharmacy_warehouse",
 		"section_2",
 		"po_box",
 		"head_office",
@@ -107,6 +108,13 @@
 			"options": "Item Group",
 			"default": "Clinic Drugs",
 			"description": "Only items in this group (and its sub-groups) appear when prescribing."
+		},
+		{
+			"fieldname": "pharmacy_warehouse",
+			"fieldtype": "Link",
+			"label": "Pharmacy Warehouse",
+			"options": "Warehouse",
+			"description": "Dispensed drugs are issued from this warehouse and stock here decides what can be prescribed."
 		}
 	],
 	"links": [],
@@ -118,18 +126,6 @@
 	"states": [],
 	"issingle": 1,
 	"permissions": [
-		{
-			"role": "System Manager",
-			"read": 1,
-			"write": 1,
-			"create": 1,
-			"delete": 1,
-			"report": 1,
-			"export": 1,
-			"print": 1,
-			"email": 1,
-			"share": 1
-		},
 		{
 			"role": "Clinic Manager",
 			"read": 1,

@@ -4,6 +4,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, nowdate
 
+from clinic import stock
 from clinic.api.common import clean, minutes_since, patient_card, require, to_number, today_start, user_name
 
 
@@ -115,6 +116,7 @@ def get_dispensing(name):
 	data["diagnoses"] = frappe.get_all(
 		"Clinic Consultation Diagnosis", filters={"parent": doc.consultation}, pluck="diagnosis"
 	)
+	data["stock"] = stock.on_hand([i.drug for i in doc.items])
 	data["weight_kg"] = frappe.db.get_value(
 		"Clinic Triage", frappe.db.get_value("Clinic Visit", doc.visit, "triage"), "weight_kg"
 	)

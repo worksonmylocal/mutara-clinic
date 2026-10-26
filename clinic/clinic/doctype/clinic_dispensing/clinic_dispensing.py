@@ -3,6 +3,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import now_datetime
 
+from clinic import stock
 from clinic.clinic.doctype.clinic_visit.clinic_visit import set_visit_status
 
 
@@ -21,4 +22,8 @@ class ClinicDispensing(Document):
 		self.pharmacist = frappe.session.user
 
 	def on_submit(self):
+		stock.issue_dispensed(self)
 		set_visit_status(self.visit, "Completed")
+
+	def on_cancel(self):
+		stock.reverse_issue(self)

@@ -13,7 +13,7 @@ PAGE_ROLES = {
 	"pharmacy": ["Clinic Pharmacist"],
 }
 
-ADMIN_ROLES = ["Clinic Manager", "System Manager"]
+ADMIN_ROLES = ["Clinic Manager"]
 ALL_CLINIC_ROLES = sorted({r for roles in PAGE_ROLES.values() for r in roles} | set(ADMIN_ROLES))
 
 PATIENT_FIELDS = [
@@ -60,7 +60,7 @@ def require_any_clinic_role():
 
 def allowed_pages():
 	roles = set(frappe.get_roles())
-	if roles & set(ADMIN_ROLES) or frappe.session.user == "Administrator":
+	if roles & set(ADMIN_ROLES):
 		return list(PAGE_ROLES)
 	return [page for page, page_roles in PAGE_ROLES.items() if roles & set(page_roles)]
 

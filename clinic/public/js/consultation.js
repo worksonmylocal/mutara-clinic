@@ -419,8 +419,11 @@
             });
             suggest($("#rx-add"), {
                 fetch: (q) => call("consultation.search_drugs", { q }, { quiet: true }),
-                render: (i) => ({ main: i.item_name, sub: i.stock_uom }),
-                onPick: (i) => { addRx(i); $("#rx-add").value = ""; },
+                render: (i) => ({ main: i.item_name, sub: i.available > 0 ? `${i.available} ${i.stock_uom} in stock` : "Out of stock" }),
+                onPick: (i) => {
+                    if (!(i.available > 0)) return toast(`${i.item_name} is out of stock at the pharmacy`, "warn");
+                    addRx(i); $("#rx-add").value = "";
+                },
                 allowNew: async (name) => {
                     const item = await call("consultation.add_drug", { drug_name: name });
                     toast(`${item.item_name} added to the medicine list`);
@@ -562,7 +565,7 @@
 
     // ---- prescriptions
     function addRx(item) {
-        state.rx.push({ drug: item.name, drug_name: item.item_name, dose: "", route: "Oral", frequency: "", duration_days: "", quantity: "", instructions: "" });
+        state.rx.push({ drug: item.name, drug_name: item.item_name, available: item.available, dose: "", route: "Oral", frequency: "", duration_days: "", quantity: "", instructions: "" });
         dirty = true; renderRx(); refreshActions();
     }
     function autoQty(i) {
@@ -587,7 +590,7 @@
                 <div class="field"><label>Days</label><input type="number" min="1" data-rx="${i}" data-k="duration_days" value="${esc(r.duration_days ?? "")}"></div>
             </div>
             <div class="grid-4">
-                <div class="field"><label>Quantity <span class="req">*</span></label><input type="number" min="0" step="any" data-rx="${i}" data-k="quantity" value="${esc(r.quantity ?? "")}"></div>
+                <div class="field"><label>Quantity <span class="req">*</span></label><input type="number" min="0" step="any" ${r.available != null ? `max="${r.available}"` : ""} data-rx="${i}" data-k="quantity" value="${esc(r.quantity ?? "")}">${r.available != null ? `<small>${r.available} in stock</small>` : ""}</div>
                 <div class="field" style="grid-column:span 3"><label>Instructions</label><input data-rx="${i}" data-k="instructions" value="${esc(r.instructions || "")}" placeholder="After meals, finish the course…"></div>
             </div></div>`).join("") : empty("No medication prescribed. Complete the consultation without pharmacy if none is needed.");
         $$("[data-rx]", el).forEach((inp) => inp.addEventListener("input", () => {

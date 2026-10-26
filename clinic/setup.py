@@ -64,6 +64,12 @@ def seed_drugs():
 		).insert(ignore_permissions=True)
 
 
+def seed_pharmacy_warehouse():
+	from clinic.stock import ensure_warehouse
+
+	ensure_warehouse()
+
+
 def before_install():
 	ensure_roles()
 
@@ -73,3 +79,4 @@ def after_install():
 	seed_investigations()
 	seed_diagnoses()
 	seed_drugs()
+	seed_pharmacy_warehouse()

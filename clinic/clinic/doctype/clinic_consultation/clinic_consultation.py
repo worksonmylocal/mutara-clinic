@@ -3,6 +3,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import getdate, nowdate
 
+from clinic import stock
 from clinic.clinic.doctype.clinic_visit.clinic_visit import CLOSED_STATUSES, set_visit_status
 from clinic.seed_data import MEDICAL_EXAM_TESTS
 
@@ -98,6 +99,22 @@ class ClinicConsultation(Document):
 		for row in self.prescriptions:
 			if (row.quantity or 0) <= 0:
 				frappe.throw(_("Row {0}: quantity for {1} must be greater than zero").format(row.idx, row.drug))
+		self.validate_stock()
+
+	def validate_stock(self):
+		"""Only what is on the pharmacy shelf (and not already promised to another patient) can be prescribed."""
+		if self.dispensing and frappe.db.get_value("Clinic Dispensing", self.dispensing, "docstatus") == 1:
+			return  # already dispensed: stock has been issued
+		wanted = {}
+		for row in self.prescriptions:
+			wanted[row.drug] = wanted.get(row.drug, 0) + (row.quantity or 0)
+		free = stock.available(list(wanted), exclude_consultation=self.name)
+		for drug, qty in wanted.items():
+			if qty > free.get(drug, 0):
+				name = frappe.db.get_value("Item", drug, "item_name") or drug
+				frappe.throw(
+					_("Only {0} of {1} is available at the pharmacy; you prescribed {2}.").format(free.get(drug, 0), name, qty)
+				)
 
 	# ------------------------------------------------------------ actions
 	@frappe.whitelist()

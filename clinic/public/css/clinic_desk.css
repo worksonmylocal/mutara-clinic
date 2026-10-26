@@ -454,3 +454,43 @@ a{color:inherit}
 .bio dt{font:600 10px var(--sans);letter-spacing:1px;text-transform:uppercase;color:var(--ink-mute);margin-bottom:2px}
 .bio dd{margin:0;color:var(--ink);font-weight:500;white-space:pre-line}
 @media (max-width:900px){.bio{grid-template-columns:1fr 1fr}}
+
+/* ============================================================ IDLE SCREEN LOCK
+   Full-screen privacy popup shown after a period without activity (js/clinic_desk.js, IdleLock).
+   CSS and inline SVG only. It has no close button; only the correct PIN (or signing out) removes it. */
+body.il-open{overflow:hidden}
+#idle-lock{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:20px;overflow:hidden;
+  background:linear-gradient(125deg,#0b3d4a,#1b6f5f,#a6bd35,#0f8aa8,#7a3fa0,#e0457b,#0b3d4a);background-size:400% 400%;animation:il-shift 22s ease infinite;font-family:var(--sans)}
+@keyframes il-shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+#idle-lock::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.14),rgba(7,25,32,.45) 70%)}
+.il-icons{position:absolute;inset:0;pointer-events:none}
+.il-ico{position:absolute;bottom:-60px;fill:hsla(var(--h),90%,88%,.55);stroke:hsla(var(--h),90%,92%,.7);stroke-width:1.2;animation:il-float linear infinite;opacity:0}
+@keyframes il-float{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.9}90%{opacity:.9}100%{transform:translateY(-115vh) rotate(300deg);opacity:0}}
+.il-ecg{position:absolute;left:0;right:0;top:50%;width:100%;height:120px;margin-top:-60px;pointer-events:none;overflow:visible}
+.il-ecg path{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.il-ecg__glow{stroke:rgba(255,255,255,.35);stroke-width:9;filter:blur(6px);stroke-dasharray:420 1500;animation:il-ecg 4.2s linear infinite}
+.il-ecg__line{stroke:#fff;stroke-width:2.6;stroke-dasharray:420 1500;animation:il-ecg 4.2s linear infinite}
+@keyframes il-ecg{from{stroke-dashoffset:420}to{stroke-dashoffset:-1500}}
+.il-card{position:relative;width:min(440px,100%);padding:32px 30px 24px;border-radius:28px;text-align:center;color:#fff;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);box-shadow:0 30px 80px -20px rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);animation:il-in .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes il-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.il-logo{position:relative;width:104px;height:104px;margin:0 auto 14px;display:grid;place-items:center}
+.il-logo img{position:relative;width:84px;height:84px;object-fit:contain;background:#fff;border-radius:50%;padding:10px;animation:il-pulse 2.4s ease-in-out infinite;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.il-logo i{position:absolute;inset:6px;border-radius:50%;border:2px solid rgba(255,255,255,.7);animation:il-ripple 3.6s ease-out infinite}
+.il-logo i:nth-child(2){animation-delay:1.2s}.il-logo i:nth-child(3){animation-delay:2.4s}
+@keyframes il-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes il-ripple{from{transform:scale(.8);opacity:.9}to{transform:scale(1.55);opacity:0}}
+.il-facility{font:600 11px var(--sans);letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:6px}
+.il-card h2{margin:0 0 8px;font:600 28px/1.15 var(--display);color:#fff;letter-spacing:-.4px}
+.il-card p{margin:0 0 20px;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.88)}
+.il-pins{display:flex;justify-content:center;gap:12px}
+.il-pins input{width:58px;height:68px;border-radius:16px;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.92);color:#0b3d4a;text-align:center;font:600 28px var(--sans);outline:0;transition:border-color .15s,box-shadow .15s,transform .15s}
+.il-pins input:focus{border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.35);transform:translateY(-2px)}
+.il-pins.shake{animation:il-shake .45s}
+@keyframes il-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+.il-msg{min-height:22px;margin:14px 0 4px;font-size:13px;font-weight:500;color:#ffe3e6;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.il-out{margin-top:6px;border:0;background:none;color:rgba(255,255,255,.85);font:500 12.5px var(--sans);text-decoration:underline;cursor:pointer;padding:6px 10px;border-radius:8px}
+.il-out:hover,.il-out:focus-visible{color:#fff;background:rgba(255,255,255,.14);outline:0}
+@media (max-width:520px){.il-card{padding:26px 18px 20px;border-radius:22px}.il-card h2{font-size:23px}.il-pins{gap:9px}.il-pins input{width:52px;height:62px;font-size:25px}}
+@media (prefers-reduced-motion:reduce){#idle-lock,.il-ico,.il-ecg__glow,.il-ecg__line,.il-card,.il-logo img,.il-logo i,.il-pins.shake{animation:none!important}.il-ico{opacity:.5;bottom:20%}.il-logo i{display:none}.il-ecg__glow,.il-ecg__line{stroke-dasharray:none}}

@@ -116,6 +116,7 @@ window.Desk = (function () {
                 <p class="pagehead__sub">${esc(sub)}</p>
             </div>
             <div class="pagehead__tools">${tools}</div>`;
+        IdleLock.init(); // only the working screens call shell(); printable pages never lock
         return who;
     }
 
@@ -502,7 +503,196 @@ window.Desk = (function () {
         draw();
     }
 
+
+    // ---------------------------------------------------------------- idle screen lock
+    // A privacy screen for shared computers, not a security boundary: the PIN is checked on the server only
+    // (api/lock.py) and API calls are not blocked while the screen is locked.
+    const IdleLock = (function () {
+        const LAST = "clinic.lastActive", LOCK_EV = "clinic.lock", UNLOCK_EV = "clinic.unlock";
+        const ICONS = {
+            cross: '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/>',
+            heart: '<path d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 2.6 4.5 6.3 4.5c2 0 3.5 1 4.2 2.3h3c.7-1.3 2.2-2.3 4.2-2.3 3.700 0 5.500 3.800 3.900 7.300C19.500 16.400 12 21 12 21z" transform="translate(0 1)"/>',
+            pill: '<rect x="2" y="8.500" width="20" height="7" rx="3.500" transform="rotate(-35 12 12)"/><path d="M9.500 6.500l5 7" transform="rotate(-35 12 12)" stroke-linecap="round"/>',
+            syringe: '<path d="M18 2l4 4M20 4l-9 9M13 7l4 4M11 13l-6 6-2 2M7 17l2 2M14 10l-2 2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+            drop: '<path d="M12 2.500s6.500 7 6.500 12a6.500 6.500 0 0 1-13 0c0-5 6.500-12 6.500-12z"/>',
+            steth: '<path d="M6 3v6a4 4 0 0 0 8 0V3M10 13v2a5 5 0 0 0 10 0v-2" fill="none" stroke-linecap="round"/><circle cx="20" cy="11" r="2"/>',
+        };
+        let cfg = null, minutes = 15, lastMem = Date.now(), locked = false, root = null, inerted = [], timer = null, lastWrite = 0, started = false;
+
+        const ls = {
+            get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+            set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* blocked: this tab still works on its own */ } },
+        };
+        const lastActive = () => Math.max(lastMem, Number(ls.get(LAST)) || 0);
+        const touch = () => { lastMem = Date.now(); ls.set(LAST, String(lastMem)); };
+
+        function onActivity() {
+            if (locked) return;
+            const now = Date.now();
+            if (now - lastWrite < 1000) return;
+            lastWrite = now;
+            touch();
+        }
+
+        function icon(name, i) {
+            const size = 26 + (i * 7) % 34, left = (i * 37 + 5) % 96, delay = -((i * 3.7) % 24), dur = 18 + (i * 5) % 16;
+            const hue = [190, 340, 160, 45, 280, 10][i % 6];
+            return `<svg class="il-ico" viewBox="0 0 24 24" width="${size}" height="${size}" style="left:${left}%;animation-duration:${dur}s;animation-delay:${delay}s;--h:${hue}" aria-hidden="true">${ICONS[name]}</svg>`;
+        }
+
+        function build() {
+            const names = Object.keys(ICONS);
+            const icons = Array.from({ length: 16 }, (_, i) => icon(names[i % names.length], i)).join("");
+            const el = document.createElement("div");
+            el.id = "idle-lock";
+            el.setAttribute("role", "dialog");
+            el.setAttribute("aria-modal", "true");
+            el.setAttribute("aria-labelledby", "il-title");
+            el.innerHTML = `
+                <div class="il-icons" aria-hidden="true">${icons}</div>
+                <svg class="il-ecg" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="il-ecg__glow" d="M0 60h330l25-8 20 8h40l22-46 30 92 28-46h60l22-14 24 14h600"/>
+                    <path class="il-ecg__line" d="M0 60h330l25-8 20 8h40l22-46 30 92 28-46h60l22-14 24 14h600"/>
+                </svg>
+                <div class="il-card">
+                    <div class="il-logo"><i></i><i></i><i></i><img src="/assets/clinic/images/mutara-logo.jpeg" alt=""></div>
+                    <div class="il-facility">${esc(cfg.facility)}</div>
+                    <h2 id="il-title">This page has been inactive</h2>
+                    <p>The screen is locked to protect patient information. Enter your 4-digit PIN to continue.</p>
+                    <div class="il-pins" id="il-pins">${[0, 1, 2, 3].map((n) => `<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="PIN digit ${n + 1}" data-n="${n}">`).join("")}</div>
+                    <div class="il-msg" id="il-msg" role="alert" aria-live="assertive"></div>
+                    <button type="button" class="il-out" id="il-out">Not you? Sign out</button>
+                </div>`;
+            return el;
+        }
+
+        function trapFocus(e) {
+            if (!root) return;
+            if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); return; }
+            if (e.key !== "Tab") return;
+            const f = Array.from(root.querySelectorAll("input,button")).filter((x) => !x.disabled);
+            if (!f.length) return;
+            const first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            else if (!root.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+        }
+        const keepFocus = (e) => { if (root && !root.contains(e.target)) { const i = root.querySelector("input:not([disabled])"); if (i) i.focus(); } };
+
+        function show() {
+            if (root) return;
+            locked = true;
+            root = build();
+            Array.from(document.body.children).forEach((c) => { if (!c.inert) { c.inert = true; inerted.push(c); } });
+            document.body.appendChild(root);
+            document.body.classList.add("il-open");
+            window.addEventListener("keydown", trapFocus, true);
+            document.addEventListener("focusin", keepFocus);
+            bindPin();
+            root.querySelector("input").focus();
+        }
+
+        function hide() {
+            if (!root) return;
+            window.removeEventListener("keydown", trapFocus, true);
+            document.removeEventListener("focusin", keepFocus);
+            root.remove(); root = null; locked = false;
+            inerted.forEach((c) => { c.inert = false; });
+            inerted = [];
+            document.body.classList.remove("il-open");
+            touch();
+        }
+
+        function bindPin() {
+            const boxes = Array.from(root.querySelectorAll("#il-pins input")), msg = root.querySelector("#il-msg");
+            let busy = false;
+            const pin = () => boxes.map((b) => b.value).join("");
+            // a click anywhere else on the popup must not take the keyboard away from the PIN boxes
+            root.addEventListener("mousedown", (e) => {
+                if (e.target.closest("input,button")) return;
+                e.preventDefault();
+                (boxes.find((x) => !x.value && !x.disabled) || boxes[0]).focus();
+            });
+            const reset = (text) => {
+                boxes.forEach((b) => { b.value = ""; b.disabled = false; });
+                msg.textContent = text || "";
+                const row = root.querySelector("#il-pins");
+                row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake");
+                boxes[0].focus();
+            };
+            async function submit() {
+                if (busy || pin().length !== 4) return;
+                busy = true; boxes.forEach((b) => (b.disabled = true)); msg.textContent = "Checking…";
+                try {
+                    await call("lock.unlock", { pin: pin() }, { quiet: true });
+                    hide();
+                    ls.set(UNLOCK_EV, String(Date.now()));
+                } catch (e) {
+                    busy = false;
+                    reset(e.message || "Could not check the PIN. Try again.");
+                }
+            }
+            boxes.forEach((b, i) => {
+                b.addEventListener("input", () => {
+                    b.value = b.value.replace(/\D/g, "").slice(-1);
+                    if (b.value && i < 3) boxes[i + 1].focus();
+                    if (i === 3 || pin().length === 4) submit();
+                });
+                b.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && !b.value && i > 0) { boxes[i - 1].value = ""; boxes[i - 1].focus(); e.preventDefault(); }
+                    if (e.key === "ArrowLeft" && i > 0) boxes[i - 1].focus();
+                    if (e.key === "ArrowRight" && i < 3) boxes[i + 1].focus();
+                });
+                b.addEventListener("paste", (e) => {
+                    e.preventDefault();
+                    const digits = ((e.clipboardData || window.clipboardData).getData("text") || "").replace(/\D/g, "").slice(0, 4);
+                    digits.split("").forEach((d, n) => { boxes[n].value = d; });
+                    (boxes[Math.min(digits.length, 3)]).focus();
+                    if (digits.length === 4) submit();
+                });
+            });
+            root.querySelector("#il-out").addEventListener("click", async () => {
+                try { await fetch("/api/method/logout", { method: "POST", credentials: "same-origin", headers: { "X-Frappe-CSRF-Token": cfg.csrf } }); } catch (e) { /* go to the login page anyway */ }
+                location.href = "/login";
+            });
+        }
+
+        function engage() {
+            if (locked) return;
+            show();
+            ls.set(LOCK_EV, String(Date.now()));
+            call("lock.lock", {}, { quiet: true }).catch(() => {});
+        }
+
+        function tick() {
+            if (!locked && Date.now() - lastActive() >= minutes * 60000) engage();
+        }
+
+        async function init() {
+            if (started) return;
+            started = true;
+            let st;
+            try { st = await call("lock.status", {}, { quiet: true }); } catch (e) { return; }
+            if (!st || !st.has_pin) return; // no PIN means nobody could unlock this user, so never lock them
+            minutes = st.minutes || 15;
+            let facility = "Mutara Orchards Clinic";
+            try { const p = await call("common.clinic_profile", {}, { quiet: true }); facility = p.clinic_name || p.company_name || facility; } catch (e) { /* default name */ }
+            cfg = { facility, csrf: cfg_csrf() };
+            touch();
+            if (st.locked) show(); // refreshed while locked: show it again without announcing it
+            ["mousemove", "mousedown", "click", "keydown", "wheel", "scroll", "touchstart", "pointerdown"].forEach((ev) =>
+                window.addEventListener(ev, onActivity, { capture: true, passive: true }));
+            window.addEventListener("storage", (e) => {
+                if (e.key === LOCK_EV && !locked) show();
+                if (e.key === UNLOCK_EV && locked) hide();
+            });
+            timer = setInterval(tick, 5000);
+        }
+        const cfg_csrf = () => (window.CLINIC || {}).csrf;
+        return { init };
+    })();
+
     return { call, esc, $, $$, num, initials, timeOf, dateOf, duration, wait, waitClass, typeTag, pill, ageSex, empty, split, money,
         toast, shell, tabs, poll, kpis, hbars, chart, stackedDatasets, stackedOptions, COLORS, modal, field, read, suggest,
-        banner, masters, facilityField, pickPatient, REFRESH_ICON, cfg };
+        banner, masters, facilityField, pickPatient, REFRESH_ICON, cfg, IdleLock };
 })();

@@ -11,6 +11,7 @@
 		"website",
 		"drug_item_group",
 		"pharmacy_warehouse",
+		"idle_lock_minutes",
 		"section_2",
 		"po_box",
 		"head_office",
@@ -115,6 +116,13 @@
 			"label": "Pharmacy Warehouse",
 			"options": "Warehouse",
 			"description": "Dispensed drugs are issued from this warehouse and stock here decides what can be prescribed."
+		},
+		{
+			"fieldname": "idle_lock_minutes",
+			"fieldtype": "Int",
+			"label": "Lock Screen After (minutes)",
+			"default": "15",
+			"description": "Idle time before the clinic screens lock and ask for the user's PIN. 1 to 240. Applies from the next page load."
 		}
 	],
 	"links": [],

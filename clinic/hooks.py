@@ -288,3 +288,6 @@ doc_events = {
 	"Role Profile": {"validate": "clinic.access.guard_role_profile"},
 	"Custom DocPerm": {"validate": "clinic.access.guard_permissions"},
 }
+
+# Idle screen lock: signing in again clears a lock left behind
+on_login = ["clinic.api.lock.clear_on_login"]

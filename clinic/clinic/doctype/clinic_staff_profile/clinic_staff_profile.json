@@ -9,7 +9,11 @@
 		"designation",
 		"column_4",
 		"registration_no",
-		"signature"
+		"signature",
+		"lock_section",
+		"screen_lock_pin",
+		"lock_column",
+		"lock_after_minutes"
 	],
 	"fields": [
 		{
@@ -53,6 +57,27 @@
 			"fieldtype": "Attach Image",
 			"label": "Signature",
 			"description": "Optional. Printed above the signature line."
+		},
+		{
+			"fieldname": "lock_section",
+			"fieldtype": "Section Break",
+			"label": "Screen Lock"
+		},
+		{
+			"fieldname": "screen_lock_pin",
+			"fieldtype": "Password",
+			"label": "Screen Lock PIN",
+			"description": "Exactly 4 digits. Set by an administrator. Without a PIN the screen never locks for this user."
+		},
+		{
+			"fieldname": "lock_column",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "lock_after_minutes",
+			"fieldtype": "Int",
+			"label": "Lock Screen After (minutes)",
+			"description": "Leave empty to use the clinic default (Clinic Settings). 1 to 240."
 		}
 	],
 	"links": [],

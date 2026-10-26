@@ -1,0 +1,240 @@
+{
+	"actions": [],
+	"creation": "2026-10-27 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"period_start",
+		"report_date",
+		"c1",
+		"report_to",
+		"prepared_by",
+		"prepared_by_title",
+		"s_sum",
+		"exec_summary",
+		"s_care",
+		"treatments_note",
+		"referral_note",
+		"s_exam",
+		"pre_employment_target",
+		"post_employment_target",
+		"exam_findings",
+		"s_pharm",
+		"stock_note",
+		"restock_note",
+		"s_edu",
+		"education_note",
+		"counselling_note",
+		"s_acc",
+		"regulatory_note",
+		"trend_note",
+		"s_occ",
+		"compliance_tracking",
+		"s_hyg",
+		"hygiene_note",
+		"policy_status",
+		"policy_note",
+		"training_note"
+	],
+	"fields": [
+		{
+			"fieldname": "period_start",
+			"fieldtype": "Date",
+			"label": "Reporting Month",
+			"reqd": 1,
+			"unique": 1,
+			"in_list_view": 1,
+			"description": "Any day in the month; saved as the 1st."
+		},
+		{
+			"fieldname": "report_date",
+			"fieldtype": "Date",
+			"label": "Report Date",
+			"default": "Today"
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "report_to",
+			"fieldtype": "Data",
+			"label": "To",
+			"default": "Human Resource Operations Manager"
+		},
+		{
+			"fieldname": "prepared_by",
+			"fieldtype": "Data",
+			"label": "From (Name)"
+		},
+		{
+			"fieldname": "prepared_by_title",
+			"fieldtype": "Data",
+			"label": "Title",
+			"default": "Clinical Officer"
+		},
+		{
+			"fieldname": "s_sum",
+			"fieldtype": "Section Break",
+			"label": "Executive summary"
+		},
+		{
+			"fieldname": "exec_summary",
+			"fieldtype": "Text",
+			"label": "Executive Summary",
+			"description": "Leave empty to print an automatic summary of the month's figures."
+		},
+		{
+			"fieldname": "s_care",
+			"fieldtype": "Section Break",
+			"label": "General medical care"
+		},
+		{
+			"fieldname": "treatments_note",
+			"fieldtype": "Small Text",
+			"label": "Treatments Provided (notes)"
+		},
+		{
+			"fieldname": "referral_note",
+			"fieldtype": "Small Text",
+			"label": "External Referrals (notes)",
+			"description": "e.g. successful transfer rate"
+		},
+		{
+			"fieldname": "s_exam",
+			"fieldtype": "Section Break",
+			"label": "Statutory medical examinations"
+		},
+		{
+			"fieldname": "pre_employment_target",
+			"fieldtype": "Int",
+			"label": "Pre-employment Exams Targeted"
+		},
+		{
+			"fieldname": "post_employment_target",
+			"fieldtype": "Int",
+			"label": "Post-employment Exams Targeted"
+		},
+		{
+			"fieldname": "exam_findings",
+			"fieldtype": "Text",
+			"label": "Summary Findings"
+		},
+		{
+			"fieldname": "s_pharm",
+			"fieldtype": "Section Break",
+			"label": "Pharmacy and medical supplies"
+		},
+		{
+			"fieldname": "stock_note",
+			"fieldtype": "Small Text",
+			"label": "Current Stock Levels (notes)"
+		},
+		{
+			"fieldname": "restock_note",
+			"fieldtype": "Small Text",
+			"label": "Restock Requirements"
+		},
+		{
+			"fieldname": "s_edu",
+			"fieldtype": "Section Break",
+			"label": "Health education and counselling"
+		},
+		{
+			"fieldname": "education_note",
+			"fieldtype": "Small Text",
+			"label": "Health Education (notes)"
+		},
+		{
+			"fieldname": "counselling_note",
+			"fieldtype": "Small Text",
+			"label": "Counselling Services (notes)"
+		},
+		{
+			"fieldname": "s_acc",
+			"fieldtype": "Section Break",
+			"label": "Accident and incident management"
+		},
+		{
+			"fieldname": "regulatory_note",
+			"fieldtype": "Small Text",
+			"label": "DOSHMIS and Insurance Compliance"
+		},
+		{
+			"fieldname": "trend_note",
+			"fieldtype": "Small Text",
+			"label": "Trend Analysis & Preventive Advisory"
+		},
+		{
+			"fieldname": "s_occ",
+			"fieldtype": "Section Break",
+			"label": "Occupational health"
+		},
+		{
+			"fieldname": "compliance_tracking",
+			"fieldtype": "Small Text",
+			"label": "Compliance Tracking"
+		},
+		{
+			"fieldname": "s_hyg",
+			"fieldtype": "Section Break",
+			"label": "Hygiene, sanitation and policy"
+		},
+		{
+			"fieldname": "hygiene_note",
+			"fieldtype": "Small Text",
+			"label": "Hygiene Audits (notes)"
+		},
+		{
+			"fieldname": "policy_status",
+			"fieldtype": "Data",
+			"label": "Policy Implementation Status",
+			"default": "Satisfactory"
+		},
+		{
+			"fieldname": "policy_note",
+			"fieldtype": "Small Text",
+			"label": "Policy Status Summary"
+		},
+		{
+			"fieldname": "training_note",
+			"fieldtype": "Small Text",
+			"label": "Training and Collaboration"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-27 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Monthly Report",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "period_start",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "CMR-.#####",
+	"naming_rule": "Expression (old style)"
+}

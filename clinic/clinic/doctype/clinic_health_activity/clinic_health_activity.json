@@ -1,0 +1,125 @@
+{
+	"actions": [],
+	"creation": "2026-10-27 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"activity_date",
+		"activity_type",
+		"topic",
+		"c1",
+		"audience",
+		"expected_attendees",
+		"attendees",
+		"attendance_pct",
+		"s1",
+		"notes"
+	],
+	"fields": [
+		{
+			"fieldname": "activity_date",
+			"fieldtype": "Date",
+			"label": "Date",
+			"default": "Today",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "activity_type",
+			"fieldtype": "Select",
+			"label": "Activity Type",
+			"options": "Health Education\nCounselling\nMeeting\nTraining\nOther",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "topic",
+			"fieldtype": "Data",
+			"label": "Topic / Title",
+			"reqd": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "audience",
+			"fieldtype": "Data",
+			"label": "Audience / Department",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "expected_attendees",
+			"fieldtype": "Int",
+			"label": "Expected Attendees"
+		},
+		{
+			"fieldname": "attendees",
+			"fieldtype": "Int",
+			"label": "Attended"
+		},
+		{
+			"fieldname": "attendance_pct",
+			"fieldtype": "Percent",
+			"label": "Attendance",
+			"read_only": 1
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "notes",
+			"fieldtype": "Text",
+			"label": "Notes / Outcome"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-27 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Health Activity",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "activity_date",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "HEA-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "topic"
+}

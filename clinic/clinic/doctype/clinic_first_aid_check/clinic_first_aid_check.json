@@ -1,0 +1,116 @@
+{
+	"actions": [],
+	"creation": "2026-10-27 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"check_date",
+		"department",
+		"c1",
+		"kit_present",
+		"stock_status",
+		"required_action",
+		"s1",
+		"notes"
+	],
+	"fields": [
+		{
+			"fieldname": "check_date",
+			"fieldtype": "Date",
+			"label": "Date",
+			"default": "Today",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"label": "Department",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "kit_present",
+			"fieldtype": "Check",
+			"label": "Kit Present",
+			"default": "1",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "stock_status",
+			"fieldtype": "Select",
+			"label": "Stock Status",
+			"options": "Full\nDepleted",
+			"default": "Full",
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "required_action",
+			"fieldtype": "Select",
+			"label": "Required Action",
+			"options": "\nRefill\nStaff Training\nReplace Kit",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "notes",
+			"fieldtype": "Small Text",
+			"label": "Notes"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-27 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic First Aid Check",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "check_date",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "FAC-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "department"
+}

@@ -70,6 +70,20 @@ def seed_pharmacy_warehouse():
 	ensure_warehouse()
 
 
+NOTIFIABLE = ["Typhoid Fever", "Tuberculosis", "Brucellosis", "Cholera", "Measles", "Meningitis", "Ebola Virus Disease"]
+
+
+def seed_notifiable():
+	"""Diseases that must be reported: counted under Notifiable Diseases in the clinic reports."""
+	for name in NOTIFIABLE:
+		if not frappe.db.exists("Clinic Diagnosis", name):
+			frappe.get_doc(
+				{"doctype": "Clinic Diagnosis", "diagnosis": name, "category": "Infectious", "is_notifiable": 1}
+			).insert(ignore_permissions=True)
+		elif not frappe.db.get_value("Clinic Diagnosis", name, "is_notifiable"):
+			frappe.db.set_value("Clinic Diagnosis", name, "is_notifiable", 1)
+
+
 def before_install():
 	ensure_roles()
 
@@ -80,3 +94,4 @@ def after_install():
 	seed_diagnoses()
 	seed_drugs()
 	seed_pharmacy_warehouse()
+	seed_notifiable()

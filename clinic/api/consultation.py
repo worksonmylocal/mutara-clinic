@@ -25,7 +25,7 @@ TEXT_FIELDS = [
 	"management_plan", "results_review_notes", "procedures_done", "patient_advice", "referral_facility", "referral_urgency",
 	"referral_reason", "referral_notes", "follow_up_date", "follow_up_reason",
 ]
-CHECK_FIELDS = ["work_related", "refer_out", "follow_up_required"]
+CHECK_FIELDS = ["work_related", "refer_out", "admitted", "follow_up_required"]
 INT_FIELDS = ["sick_leave_days", "light_duty_days"]
 
 

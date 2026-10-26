@@ -1,0 +1,127 @@
+{
+	"actions": [],
+	"creation": "2026-10-27 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"audit_date",
+		"category",
+		"area",
+		"c1",
+		"rating",
+		"result",
+		"collection_frequency",
+		"contractor_rating",
+		"s1",
+		"corrective_action"
+	],
+	"fields": [
+		{
+			"fieldname": "audit_date",
+			"fieldtype": "Date",
+			"label": "Date",
+			"default": "Today",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "category",
+			"fieldtype": "Select",
+			"label": "Category",
+			"options": "Facility\nWater\nWaste",
+			"default": "Facility",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "area",
+			"fieldtype": "Data",
+			"label": "Facility / Service Area",
+			"reqd": 1,
+			"in_list_view": 1,
+			"description": "e.g. Toilets, Locker Rooms, Canteens, Drinking Water, Waste Collection"
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "rating",
+			"fieldtype": "Int",
+			"label": "Rating (1-5)",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "result",
+			"fieldtype": "Data",
+			"label": "Result / Compliance",
+			"description": "e.g. Pass, 100%"
+		},
+		{
+			"fieldname": "collection_frequency",
+			"fieldtype": "Data",
+			"label": "Collection / Testing Frequency"
+		},
+		{
+			"fieldname": "contractor_rating",
+			"fieldtype": "Data",
+			"label": "Contractor Rating"
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "corrective_action",
+			"fieldtype": "Small Text",
+			"label": "Corrective Action Required"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-27 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Hygiene Audit",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "audit_date",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "HYG-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "area"
+}

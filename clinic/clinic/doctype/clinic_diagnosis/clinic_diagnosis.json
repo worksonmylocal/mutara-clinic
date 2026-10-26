@@ -8,7 +8,8 @@
 		"icd_code",
 		"column_3",
 		"category",
-		"is_occupational"
+		"is_occupational",
+		"is_notifiable"
 	],
 	"fields": [
 		{
@@ -43,6 +44,13 @@
 			"fieldtype": "Check",
 			"label": "Occupational / Work-related Condition",
 			"description": "Conditions typically linked to farm work (chemical exposure, injuries, repetitive strain). Used in the employee health reports."
+		},
+		{
+			"fieldname": "is_notifiable",
+			"fieldtype": "Check",
+			"label": "Notifiable Disease",
+			"description": "Counted under Notifiable Diseases in the clinic reports.",
+			"in_list_view": 1
 		}
 	],
 	"links": [],

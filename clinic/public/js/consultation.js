@@ -315,6 +315,7 @@
                                 ${field("referral_facility", "Facility", { value: c.referral_facility, placeholder: "Type to search or add" })}
                                 ${field("referral_urgency", "Urgency", { type: "select", options: ["Routine", "Urgent", "Emergency"], value: c.referral_urgency || "Routine" })}
                             </div>
+                            ${field("admitted", "Admitted at the referral facility", { type: "checkbox", value: c.admitted })}
                             ${ta("referral_reason", "Reason for referral", 2)}
                             ${ta("referral_notes", "Clinical notes for the receiving facility", 3)}
                         </div>

@@ -77,6 +77,7 @@
 		"refer_out",
 		"referral_facility",
 		"referral_urgency",
+		"admitted",
 		"col_ref",
 		"referral_reason",
 		"referral_notes",
@@ -608,6 +609,12 @@
 			"fieldname": "results_review_notes",
 			"fieldtype": "Text",
 			"label": "Doctor's Review of Results"
+		},
+		{
+			"fieldname": "admitted",
+			"fieldtype": "Check",
+			"label": "Admitted at Referral Facility",
+			"depends_on": "refer_out"
 		}
 	],
 	"links": [],

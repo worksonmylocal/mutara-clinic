@@ -101,3 +101,30 @@ def medical_certificate(consultation):
 	)
 	doc.add_comment("Info", _("Medical certificate printed by {0}").format(user_name(frappe.session.user)))
 	return data
+
+
+@frappe.whitelist()
+def weekly_report(week=None, include_sunday=0):
+	"""The weekly clinic activity report: one column per day."""
+	require_any("consultation")
+	from clinic.reports import weekly_data
+
+	return {
+		"clinic": clinic_profile(),
+		"report": weekly_data(week, int(include_sunday or 0)),
+		"printed_by": user_name(frappe.session.user),
+		"printed_on": now_datetime(),
+	}
+
+
+@frappe.whitelist()
+def monthly_report(month=None):
+	"""The clinical officer's monthly report for the month containing `month` (YYYY-MM or a date)."""
+	require_any("consultation")
+	from clinic.reports import monthly_data
+
+	if month and len(month) == 7:
+		month += "-01"
+	data = monthly_data(month)
+	data.update(clinic=clinic_profile(), printed_by=user_name(frappe.session.user), printed_on=now_datetime())
+	return data

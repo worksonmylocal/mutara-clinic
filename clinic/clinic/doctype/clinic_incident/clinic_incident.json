@@ -1,0 +1,223 @@
+{
+	"actions": [],
+	"creation": "2026-10-27 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"incident_date",
+		"report_type",
+		"severity",
+		"c1",
+		"patient",
+		"employee_name",
+		"department",
+		"consultation",
+		"s1",
+		"description",
+		"injury_type",
+		"work_related",
+		"s2",
+		"stabilization_steps",
+		"referral_destination",
+		"c2",
+		"accompanied_by_co",
+		"s3",
+		"root_cause",
+		"corrective_actions",
+		"s4",
+		"doshmis_status",
+		"c3",
+		"insurance_status"
+	],
+	"fields": [
+		{
+			"fieldname": "incident_date",
+			"fieldtype": "Date",
+			"label": "Date",
+			"default": "Today",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "report_type",
+			"fieldtype": "Select",
+			"label": "Report Type",
+			"options": "Incident\nAccident",
+			"default": "Accident",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "severity",
+			"fieldtype": "Select",
+			"label": "Severity",
+			"options": "Minor\nModerate\nSevere\nFatal",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "patient",
+			"fieldtype": "Link",
+			"label": "Employee (Patient)",
+			"options": "Clinic Patient"
+		},
+		{
+			"fieldname": "employee_name",
+			"fieldtype": "Data",
+			"label": "Employee Name",
+			"fetch_from": "patient.full_name",
+			"read_only": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"label": "Department",
+			"fetch_from": "patient.department",
+			"fetch_if_empty": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "consultation",
+			"fieldtype": "Link",
+			"label": "Consultation",
+			"options": "Clinic Consultation"
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break",
+			"label": "What happened"
+		},
+		{
+			"fieldname": "description",
+			"fieldtype": "Small Text",
+			"label": "Brief Description",
+			"reqd": 1
+		},
+		{
+			"fieldname": "injury_type",
+			"fieldtype": "Data",
+			"label": "Injury / Nature of Incident"
+		},
+		{
+			"fieldname": "work_related",
+			"fieldtype": "Check",
+			"label": "Work-related",
+			"default": "1"
+		},
+		{
+			"fieldname": "s2",
+			"fieldtype": "Section Break",
+			"label": "Emergency response"
+		},
+		{
+			"fieldname": "stabilization_steps",
+			"fieldtype": "Small Text",
+			"label": "Stabilization Steps Taken"
+		},
+		{
+			"fieldname": "referral_destination",
+			"fieldtype": "Link",
+			"label": "Referral Destination",
+			"options": "Clinic Facility"
+		},
+		{
+			"fieldname": "c2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "accompanied_by_co",
+			"fieldtype": "Check",
+			"label": "Accompanied by Clinical Officer"
+		},
+		{
+			"fieldname": "s3",
+			"fieldtype": "Section Break",
+			"label": "Root cause analysis"
+		},
+		{
+			"fieldname": "root_cause",
+			"fieldtype": "Small Text",
+			"label": "Root Cause (RCA)"
+		},
+		{
+			"fieldname": "corrective_actions",
+			"fieldtype": "Small Text",
+			"label": "Corrective Actions"
+		},
+		{
+			"fieldname": "s4",
+			"fieldtype": "Section Break",
+			"label": "Regulatory and insurance"
+		},
+		{
+			"fieldname": "doshmis_status",
+			"fieldtype": "Select",
+			"label": "DOSHMIS Filing",
+			"options": "Not Required\nPending\nIn Progress\nFiled",
+			"default": "Pending"
+		},
+		{
+			"fieldname": "c3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "insurance_status",
+			"fieldtype": "Select",
+			"label": "Insurance Claim",
+			"options": "Not Applicable\nOngoing\nSettled",
+			"default": "Not Applicable"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-27 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Incident",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "incident_date",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "INC-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "employee_name",
+	"search_fields": "employee_name,department,description"
+}

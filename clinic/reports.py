@@ -54,6 +54,12 @@ def weekly_data(any_date=None, include_sunday=False):
 		order_by="creation",
 	)
 	notifiable = _notifiable(start, end)
+	field_cases = frappe.get_all(
+		"Clinic First Aid Case",
+		filters={"case_datetime": ["between", _between(start, end)]},
+		fields=["case_datetime", "nature", "department", "outcome", "first_aider_name"],
+		order_by="case_datetime",
+	)
 
 	def of_day(rows, key, day):
 		return [r for r in rows if getdate(r[key]) == day]
@@ -93,6 +99,8 @@ def weekly_data(any_date=None, include_sunday=False):
 			"total": len(notifiable)},
 		{"label": "Medical Examinations (No. & Type)", "kind": "text", "cells": [exam_cell(d) for d in days],
 			"total": sum(1 for c in consultations if c.consultation_type in MEDICALS)},
+		listing("First Aid Given on the Farm (by first aiders)", field_cases, "case_datetime", lambda r: True, "None",
+			lambda r: f"{r.nature}" + (f" — {r.department}" if r.department else "") + (f" → {r.outcome}" if r.outcome != "Treated on site" else "")),
 		listing("Meetings", activities, "activity_date", lambda r: r.activity_type == "Meeting", "None", lambda r: r.topic),
 		listing("Health Education / Counselling / Training", activities, "activity_date",
 			lambda r: r.activity_type != "Meeting", "None", lambda r: f"{r.activity_type}: {r.topic}"),
@@ -176,6 +184,18 @@ def monthly_data(any_date=None):
 		JOIN `tabClinic Consultation` c ON c.name = d.parent LEFT JOIN `tabClinic Diagnosis` x ON x.name = d.diagnosis
 		WHERE c.consultation_date BETWEEN %s AND %s GROUP BY x.category ORDER BY n DESC""", rng, as_dict=True)
 
+	fa_cases = frappe.get_all(
+		"Clinic First Aid Case", filters={"case_datetime": ["between", rng]},
+		fields=["name", "case_datetime", "department", "nature", "outcome", "first_aider_name", "kit"])
+	fa_supplies = frappe.db.sql(
+		"""SELECT i.item_name AS item, SUM(i.qty) AS qty, i.uom FROM `tabClinic First Aid Item` i
+		JOIN `tabClinic First Aid Case` c ON c.name = i.parent
+		WHERE i.parenttype = 'Clinic First Aid Case' AND c.case_datetime BETWEEN %s AND %s GROUP BY i.item_name, i.uom ORDER BY qty DESC""", rng, as_dict=True)
+	kits = []
+	for kit in frappe.get_all("Clinic First Aid Kit", filters={"active": 1}, fields=["kit_name", "department", "warehouse"], order_by="kit_name"):
+		rows = stock.kit_stock(kit.warehouse) if kit.warehouse else []
+		kits.append({"kit": kit.kit_name, "department": kit.department, "items": len(rows), "low": [r["item_name"] for r in rows if r["qty"] <= 2]})
+
 	def exam(done, target_field):
 		target = (doc or {}).get(target_field) or 0
 		return {"targeted": target, "completed": len(done), "gap": round((target - len(done)) * 100 / target) if target else None}
@@ -202,6 +222,9 @@ def monthly_data(any_date=None):
 		"education": {"sessions": education, "counselling": counselling, "avg_attendance": round(sum(attendance) / len(attendance), 1) if attendance else None},
 		"meetings": meetings,
 		"emergencies": [i for i in incidents if i.stabilization_steps or i.referral_destination],
+		"field_first_aid": {"total": len(fa_cases), "by_department": Counter(c.department or "Not stated" for c in fa_cases).most_common(),
+			"by_nature": Counter(c.nature for c in fa_cases).most_common(), "outcomes": Counter(c.outcome for c in fa_cases).most_common(),
+			"supplies": fa_supplies, "kits": kits},
 		"first_aid": {"rows": first_aid, "depleted": sum(1 for r in first_aid if r.stock_status == "Depleted")},
 		"incidents": incidents,
 		"surveillance": {"entries": surveillance, "requested": requested},

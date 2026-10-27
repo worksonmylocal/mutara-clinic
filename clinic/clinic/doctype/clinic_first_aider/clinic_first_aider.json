@@ -1,0 +1,136 @@
+{
+	"actions": [],
+	"creation": "2026-10-28 09:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"user",
+		"full_name",
+		"employee",
+		"department",
+		"c1",
+		"kit",
+		"active",
+		"s1",
+		"certification_no",
+		"trained_on",
+		"c2",
+		"certificate_expiry"
+	],
+	"fields": [
+		{
+			"fieldname": "user",
+			"fieldtype": "Link",
+			"label": "User",
+			"options": "User",
+			"reqd": 1,
+			"unique": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "full_name",
+			"fieldtype": "Data",
+			"label": "Name",
+			"fetch_from": "user.full_name",
+			"read_only": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "employee",
+			"fieldtype": "Link",
+			"label": "Employee",
+			"options": "Employee"
+		},
+		{
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"label": "Department",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "kit",
+			"fieldtype": "Link",
+			"label": "Kit",
+			"options": "Clinic First Aid Kit",
+			"reqd": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "active",
+			"fieldtype": "Check",
+			"label": "Active",
+			"default": "1"
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break",
+			"label": "Training"
+		},
+		{
+			"fieldname": "certification_no",
+			"fieldtype": "Data",
+			"label": "Certificate No."
+		},
+		{
+			"fieldname": "trained_on",
+			"fieldtype": "Date",
+			"label": "Trained On"
+		},
+		{
+			"fieldname": "c2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "certificate_expiry",
+			"fieldtype": "Date",
+			"label": "Certificate Expires"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-28 09:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic First Aider",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "field:user",
+	"naming_rule": "By fieldname",
+	"title_field": "full_name"
+}

@@ -131,3 +131,19 @@ DRUGS = [
 	"Omeprazole 20mg Capsules",
 	"Oral Rehydration Salts Sachets",
 ]
+
+
+# Supplies for the first aid kits (ERPNext Items in the first aid supplies group)
+FIRST_AID_ITEM_GROUP = "First Aid Supplies"
+FIRST_AID_ITEMS = [
+	"Gauze Bandage 10cm",
+	"Triangular Bandage",
+	"Adhesive Plasters (Box)",
+	"Cotton Wool 100g",
+	"Povidone Iodine 100ml",
+	"Normal Saline 500ml",
+	"Disposable Gloves (Pair)",
+	"Burn Dressing",
+	"Eye Wash 500ml",
+	"Surgical Tape",
+]

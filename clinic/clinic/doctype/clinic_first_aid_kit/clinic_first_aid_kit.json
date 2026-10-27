@@ -1,0 +1,109 @@
+{
+	"actions": [],
+	"creation": "2026-10-28 09:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"kit_name",
+		"department",
+		"c1",
+		"warehouse",
+		"active",
+		"s1",
+		"notes"
+	],
+	"fields": [
+		{
+			"fieldname": "kit_name",
+			"fieldtype": "Data",
+			"label": "Kit Name",
+			"reqd": 1,
+			"unique": 1,
+			"in_list_view": 1,
+			"description": "e.g. Irrigation Kit"
+		},
+		{
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"label": "Department / Location",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "warehouse",
+			"fieldtype": "Link",
+			"label": "Kit Warehouse",
+			"options": "Warehouse",
+			"read_only": 1,
+			"description": "Created automatically. The kit's supplies are stock in this warehouse."
+		},
+		{
+			"fieldname": "active",
+			"fieldtype": "Check",
+			"label": "Active",
+			"default": "1"
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "notes",
+			"fieldtype": "Small Text",
+			"label": "Notes"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-28 09:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic First Aid Kit",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Pharmacist",
+			"read": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "field:kit_name",
+	"naming_rule": "By fieldname",
+	"title_field": "kit_name"
+}

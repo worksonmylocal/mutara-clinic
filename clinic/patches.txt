@@ -6,3 +6,4 @@ clinic.patches.seed_clinic_masters
 clinic.patches.seed_clinic_drugs
 clinic.patches.seed_pharmacy_warehouse
 clinic.patches.seed_notifiable_diseases
+clinic.patches.seed_first_aid

@@ -1,0 +1,136 @@
+{
+	"actions": [],
+	"creation": "2026-10-28 09:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"issue_date",
+		"kit",
+		"c1",
+		"issued_to",
+		"issued_by",
+		"s1",
+		"items",
+		"remarks",
+		"stock_entry",
+		"amended_from"
+	],
+	"fields": [
+		{
+			"fieldname": "issue_date",
+			"fieldtype": "Date",
+			"label": "Date",
+			"default": "Today",
+			"reqd": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "kit",
+			"fieldtype": "Link",
+			"label": "Kit",
+			"options": "Clinic First Aid Kit",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "issued_to",
+			"fieldtype": "Link",
+			"label": "Issued To (First Aider)",
+			"options": "Clinic First Aider",
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "issued_by",
+			"fieldtype": "Link",
+			"label": "Issued By",
+			"options": "User",
+			"default": "__user",
+			"read_only": 1
+		},
+		{
+			"fieldname": "s1",
+			"fieldtype": "Section Break",
+			"label": "Supplies"
+		},
+		{
+			"fieldname": "items",
+			"fieldtype": "Table",
+			"label": "Supplies",
+			"options": "Clinic First Aid Item",
+			"reqd": 1
+		},
+		{
+			"fieldname": "remarks",
+			"fieldtype": "Small Text",
+			"label": "Remarks"
+		},
+		{
+			"fieldname": "stock_entry",
+			"fieldtype": "Link",
+			"label": "Stock Entry",
+			"options": "Stock Entry",
+			"read_only": 1,
+			"no_copy": 1
+		},
+		{
+			"fieldname": "amended_from",
+			"fieldtype": "Link",
+			"label": "Amended From",
+			"options": "Clinic Kit Issue",
+			"read_only": 1,
+			"no_copy": 1,
+			"print_hide": 1
+		}
+	],
+	"links": [],
+	"modified": "2026-10-28 09:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic Kit Issue",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "issue_date",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Pharmacist",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "KIS-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "kit",
+	"is_submittable": 1
+}

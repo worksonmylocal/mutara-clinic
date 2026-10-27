@@ -140,3 +140,112 @@ def add_opening_stock(quantity=100, rate=10):
 	entry.insert(ignore_permissions=True)
 	entry.submit()
 	return entry.name
+
+
+# ---------------------------------------------------------------- first aid kits
+KITS_GROUP = "First Aid Kits"
+
+
+def _company():
+	return frappe.defaults.get_global_default("company") or frappe.db.get_value("Company", {}, "name")
+
+
+def ensure_kit_warehouse(kit_name):
+	"""A warehouse per kit, under a 'First Aid Kits' group warehouse, so each kit's supplies are real stock."""
+	company = _company()
+	abbr = frappe.db.get_value("Company", company, "abbr")
+	root = f"All Warehouses - {abbr}"
+	group = f"{KITS_GROUP} - {abbr}"
+	if not frappe.db.exists("Warehouse", group):
+		frappe.get_doc(
+			{
+				"doctype": "Warehouse",
+				"warehouse_name": KITS_GROUP,
+				"company": company,
+				"is_group": 1,
+				"parent_warehouse": root if frappe.db.exists("Warehouse", root) else None,
+			}
+		).insert(ignore_permissions=True)
+	name = f"{kit_name} Kit - {abbr}"
+	if not frappe.db.exists("Warehouse", name):
+		frappe.get_doc(
+			{"doctype": "Warehouse", "warehouse_name": f"{kit_name} Kit", "company": company, "parent_warehouse": group}
+		).insert(ignore_permissions=True)
+	return name
+
+
+def supply_groups():
+	"""Item groups whose items can be put in a first aid kit: the clinic drugs and the first aid supplies."""
+	from clinic.api.consultation import drug_groups
+
+	group = frappe.db.get_single_value("Clinic Settings", "first_aid_item_group") or "First Aid Supplies"
+	return list(set(drug_groups()) | {group})
+
+
+def _entry(doc, entry_type, source, target, rows, remarks):
+	entry = frappe.get_doc(
+		{
+			"doctype": "Stock Entry",
+			"stock_entry_type": entry_type,
+			"purpose": entry_type,
+			"company": frappe.db.get_value("Warehouse", source or target, "company"),
+			"posting_date": nowdate(),
+			"posting_time": nowtime(),
+			"remarks": remarks,
+			"items": [
+				{
+					"item_code": r.item,
+					"s_warehouse": source,
+					"t_warehouse": target,
+					"qty": flt(r.qty),
+					"uom": frappe.db.get_value("Item", r.item, "stock_uom"),
+				}
+				for r in rows
+			],
+		}
+	)
+	entry.insert(ignore_permissions=True)
+	entry.submit()
+	return entry.name
+
+
+def transfer_to_kit(issue):
+	"""Clinic Kit Issue: move supplies from the pharmacy to the kit (Material Transfer)."""
+	source = pharmacy_warehouse()
+	if not source:
+		frappe.throw(_("Set the Pharmacy Warehouse in Clinic Settings first"))
+	target = frappe.db.get_value("Clinic First Aid Kit", issue.kit, "warehouse")
+	name = _entry(issue, "Material Transfer", source, target, issue.items, _("Issued to first aid kit {0} ({1})").format(issue.kit, issue.name))
+	issue.db_set("stock_entry", name)
+
+
+def issue_from_kit(case):
+	"""Clinic First Aid Case: take the supplies used off the kit. A shortage never blocks recording the case."""
+	if not case.items:
+		return
+	warehouse = frappe.db.get_value("Clinic First Aid Kit", case.kit, "warehouse") if case.kit else None
+	if not warehouse:
+		case.db_set("supplies_note", _("The first aider's kit has no warehouse, so supplies were not deducted."))
+		return
+	frappe.db.savepoint("first_aid_issue")
+	try:
+		name = _entry(case, "Material Issue", warehouse, None, case.items, _("First aid case {0}").format(case.name))
+		case.db_set("stock_entry", name)
+	except Exception as e:
+		frappe.db.rollback(save_point="first_aid_issue")
+		case.db_set("supplies_note", _("Supplies were not deducted from the kit: {0}").format(frappe.utils.strip_html(str(e))[:300]))
+
+
+def reverse_entry(doc):
+	if doc.stock_entry and frappe.db.get_value("Stock Entry", doc.stock_entry, "docstatus") == 1:
+		frappe.get_doc("Stock Entry", doc.stock_entry).cancel()
+
+
+def kit_stock(warehouse):
+	"""[{item, item_name, uom, qty}] on a kit's shelf."""
+	rows = frappe.get_all("Bin", filters={"warehouse": warehouse, "actual_qty": [">", 0]}, fields=["item_code", "actual_qty"])
+	names = {i.name: i for i in frappe.get_all("Item", filters={"name": ["in", [r.item_code for r in rows] or [""]]}, fields=["name", "item_name", "stock_uom"])}
+	return sorted(
+		[{"item": r.item_code, "item_name": names[r.item_code].item_name, "uom": names[r.item_code].stock_uom, "qty": flt(r.actual_qty)} for r in rows if r.item_code in names],
+		key=lambda r: r["item_name"],
+	)

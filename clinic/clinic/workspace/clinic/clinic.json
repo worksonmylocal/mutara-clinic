@@ -1,7 +1,7 @@
 {
  "app": "clinic",
  "charts": [],
- "content": "[{\"id\": \"hdr1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Clinic Desks</b></span>\", \"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Triage Desk\", \"col\": 4}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Doctor Desk\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pharmacy Desk\", \"col\": 4}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Patient Journey</b></span>\", \"col\": 12}}, {\"id\": \"pj0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Patient\", \"col\": 3}}, {\"id\": \"pj1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Visit\", \"col\": 3}}, {\"id\": \"pj2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Consultation\", \"col\": 3}}, {\"id\": \"pj3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dispensing\", \"col\": 3}}, {\"id\": \"pj4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Appointment\", \"col\": 3}}, {\"id\": \"sp2\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr3\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports &amp; Safety</b></span>\", \"col\": 12}}, {\"id\": \"rp0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Weekly Clinic Activity\", \"col\": 3}}, {\"id\": \"rp1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Monthly Report\", \"col\": 3}}, {\"id\": \"rp2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Incidents & Accidents\", \"col\": 3}}, {\"id\": \"rp3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Health Education & Meetings\", \"col\": 3}}]",
+ "content": "[{\"id\": \"hdr1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Clinic Desks</b></span>\", \"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Triage Desk\", \"col\": 4}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Doctor Desk\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pharmacy Desk\", \"col\": 4}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Patient Journey</b></span>\", \"col\": 12}}, {\"id\": \"pj0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Patient\", \"col\": 3}}, {\"id\": \"pj1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Visit\", \"col\": 3}}, {\"id\": \"pj2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Consultation\", \"col\": 3}}, {\"id\": \"pj3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dispensing\", \"col\": 3}}, {\"id\": \"pj4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Appointment\", \"col\": 3}}, {\"id\": \"sp2\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr3\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports &amp; Safety</b></span>\", \"col\": 12}}, {\"id\": \"rp0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Weekly Clinic Activity\", \"col\": 3}}, {\"id\": \"rp1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Monthly Report\", \"col\": 3}}, {\"id\": \"rp2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Incidents & Accidents\", \"col\": 3}}, {\"id\": \"rp3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Health Education & Meetings\", \"col\": 3}}, {\"id\": \"fa0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"First Aid Cases\", \"col\": 3}}, {\"id\": \"fa1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Kit Issues\", \"col\": 3}}]",
  "creation": "2026-09-29 19:48:54.784253",
  "custom_blocks": [],
  "docstatus": 0,
@@ -14,7 +14,7 @@
  "is_hidden": 0,
  "label": "Clinic",
  "links": [],
- "modified": "2026-10-27 12:30:00.000000",
+ "modified": "2026-10-28 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Clinic",
  "name": "Clinic",
@@ -125,6 +125,20 @@
    "label": "Weekly Clinic Activity",
    "link_to": "Weekly Clinic Activity",
    "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "First Aid Cases",
+   "link_to": "Clinic First Aid Case",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Kit Issues",
+   "link_to": "Clinic Kit Issue",
+   "type": "DocType"
   }
  ],
  "title": "Clinic",

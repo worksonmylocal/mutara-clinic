@@ -1,0 +1,232 @@
+{
+	"actions": [],
+	"creation": "2026-10-28 09:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"case_datetime",
+		"first_aider",
+		"first_aider_name",
+		"kit",
+		"c1",
+		"patient_name",
+		"employee",
+		"department",
+		"location",
+		"s2",
+		"nature",
+		"description",
+		"treatment",
+		"s3",
+		"items",
+		"stock_entry",
+		"supplies_note",
+		"s4",
+		"outcome",
+		"clinic_visit",
+		"incident",
+		"c3",
+		"reviewed",
+		"review_notes"
+	],
+	"fields": [
+		{
+			"fieldname": "case_datetime",
+			"fieldtype": "Datetime",
+			"label": "Date & Time",
+			"default": "Now",
+			"reqd": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "first_aider",
+			"fieldtype": "Link",
+			"label": "First Aider",
+			"options": "Clinic First Aider",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "first_aider_name",
+			"fieldtype": "Data",
+			"label": "First Aider Name",
+			"fetch_from": "first_aider.full_name",
+			"read_only": 1
+		},
+		{
+			"fieldname": "kit",
+			"fieldtype": "Link",
+			"label": "Kit",
+			"options": "Clinic First Aid Kit",
+			"fetch_from": "first_aider.kit",
+			"read_only": 1
+		},
+		{
+			"fieldname": "c1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "patient_name",
+			"fieldtype": "Data",
+			"label": "Employee Treated",
+			"reqd": 1,
+			"in_list_view": 1
+		},
+		{
+			"fieldname": "employee",
+			"fieldtype": "Link",
+			"label": "Employee (if on the list)",
+			"options": "Employee"
+		},
+		{
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"label": "Department",
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "location",
+			"fieldtype": "Data",
+			"label": "Location on the Farm"
+		},
+		{
+			"fieldname": "s2",
+			"fieldtype": "Section Break",
+			"label": "What happened"
+		},
+		{
+			"fieldname": "nature",
+			"fieldtype": "Select",
+			"label": "Nature",
+			"options": "Cut / wound\nBurn\nFracture / sprain / soft tissue\nEye injury\nChemical exposure\nFainting / dizziness\nFever / illness\nInsect / snake bite\nOther",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "description",
+			"fieldtype": "Small Text",
+			"label": "Description"
+		},
+		{
+			"fieldname": "treatment",
+			"fieldtype": "Small Text",
+			"label": "First Aid Given",
+			"reqd": 1
+		},
+		{
+			"fieldname": "s3",
+			"fieldtype": "Section Break",
+			"label": "Supplies used"
+		},
+		{
+			"fieldname": "items",
+			"fieldtype": "Table",
+			"label": "Supplies Used",
+			"options": "Clinic First Aid Item"
+		},
+		{
+			"fieldname": "stock_entry",
+			"fieldtype": "Link",
+			"label": "Stock Entry",
+			"options": "Stock Entry",
+			"read_only": 1,
+			"no_copy": 1
+		},
+		{
+			"fieldname": "supplies_note",
+			"fieldtype": "Small Text",
+			"label": "Supplies Note",
+			"read_only": 1,
+			"description": "Filled in when supplies could not be deducted from the kit."
+		},
+		{
+			"fieldname": "s4",
+			"fieldtype": "Section Break",
+			"label": "Outcome"
+		},
+		{
+			"fieldname": "outcome",
+			"fieldtype": "Select",
+			"label": "Outcome",
+			"options": "Treated on site\nSent to the clinic\nReferred to hospital\nSent home",
+			"default": "Treated on site",
+			"reqd": 1,
+			"in_list_view": 1,
+			"in_standard_filter": 1
+		},
+		{
+			"fieldname": "clinic_visit",
+			"fieldtype": "Link",
+			"label": "Clinic Visit",
+			"options": "Clinic Visit"
+		},
+		{
+			"fieldname": "incident",
+			"fieldtype": "Link",
+			"label": "Incident / Accident Record",
+			"options": "Clinic Incident"
+		},
+		{
+			"fieldname": "c3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "reviewed",
+			"fieldtype": "Check",
+			"label": "Reviewed by the Clinic"
+		},
+		{
+			"fieldname": "review_notes",
+			"fieldtype": "Small Text",
+			"label": "Clinic Notes"
+		}
+	],
+	"links": [],
+	"modified": "2026-10-28 09:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Clinic",
+	"name": "Clinic First Aid Case",
+	"owner": "Administrator",
+	"states": [],
+	"sort_field": "case_datetime",
+	"sort_order": "DESC",
+	"track_changes": 1,
+	"permissions": [
+		{
+			"role": "Clinic Manager",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"delete": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1,
+			"email": 1,
+			"share": 1
+		},
+		{
+			"role": "Clinic Doctor",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		},
+		{
+			"role": "Clinic Nurse",
+			"read": 1,
+			"write": 1,
+			"create": 1,
+			"report": 1,
+			"export": 1,
+			"print": 1
+		}
+	],
+	"autoname": "FAS-.YYYY.-.#####",
+	"naming_rule": "Expression (old style)",
+	"title_field": "patient_name"
+}

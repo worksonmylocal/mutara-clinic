@@ -72,4 +72,5 @@ def guard_permissions(doc, method=None):
 
 
 def has_clinic_role(user=None):
-	return bool(set(frappe.get_roles(user)) & CLINIC_ROLES)
+	"""A role that opens the clinic app on the desk. First aiders only use their phone page, not the desk."""
+	return bool(set(frappe.get_roles(user)) & (CLINIC_ROLES - {"Clinic First Aider"}))

@@ -494,3 +494,22 @@ body.il-open{overflow:hidden}
 .il-out:hover,.il-out:focus-visible{color:#fff;background:rgba(255,255,255,.14);outline:0}
 @media (max-width:520px){.il-card{padding:26px 18px 20px;border-radius:22px}.il-card h2{font-size:23px}.il-pins{gap:9px}.il-pins input{width:52px;height:62px;font-size:25px}}
 @media (prefers-reduced-motion:reduce){#idle-lock,.il-ico,.il-ecg__glow,.il-ecg__line,.il-card,.il-logo img,.il-logo i,.il-pins.shake{animation:none!important}.il-ico{opacity:.5;bottom:20%}.il-logo i{display:none}.il-ecg__glow,.il-ecg__line{stroke-dasharray:none}}
+
+/* Popups on phones: use the whole screen width and keep the buttons reachable */
+@media (max-width:640px){
+  .modal-back{padding:8px}
+  .modal{border-radius:20px}
+  .modal__head{padding:20px 18px 0}
+  .modal__body{padding:16px 18px}
+  .modal__foot{padding:14px 18px 18px;position:sticky;bottom:0;background:var(--surface-2);border-radius:0 0 20px 20px;z-index:2}
+}
+
+/* Working screens on phones */
+@media (max-width:700px){
+  .topbar{padding:10px 14px;flex-wrap:wrap;row-gap:8px}
+  .topbar__nav{margin-left:0;order:3;width:100%;overflow-x:auto}
+  .topbar__right span{display:none}
+  .page{padding:20px 14px 60px}
+  .pagehead{grid-template-columns:1fr;gap:14px}
+  .pagehead__title{font-size:30px}
+}

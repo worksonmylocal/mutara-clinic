@@ -11,10 +11,12 @@ PAGE_ROLES = {
 	"triage": ["Clinic Receptionist", "Clinic Nurse"],
 	"consultation": ["Clinic Doctor"],
 	"pharmacy": ["Clinic Pharmacist"],
+	"firstaid": ["Clinic First Aider"],
 }
 
 ADMIN_ROLES = ["Clinic Manager"]
-ALL_CLINIC_ROLES = sorted({r for roles in PAGE_ROLES.values() for r in roles} | set(ADMIN_ROLES))
+# First aiders only use their own page: they must never pass the checks that guard patient data
+ALL_CLINIC_ROLES = sorted({r for page, roles in PAGE_ROLES.items() if page != "firstaid" for r in roles} | set(ADMIN_ROLES))
 
 PATIENT_FIELDS = [
 	"name",

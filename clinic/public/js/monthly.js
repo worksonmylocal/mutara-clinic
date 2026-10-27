@@ -39,7 +39,13 @@
             ${table(["Date", "Incident / intervention", "Stabilization steps taken", "Referral destination", "Accompanied by CO?"], d.emergencies.map((i) => [day(i.incident_date), i.description, i.stabilization_steps, i.referral_destination, i.accompanied_by_co ? "Yes" : "No"]), "No emergency interventions this month.")}
             <div class="note" style="margin-top:8px"><b>First aid readiness by department.</b>${d.first_aid.rows.length ? ` ${d.first_aid.depleted} of ${d.first_aid.rows.length} (${Math.round(d.first_aid.depleted * 100 / d.first_aid.rows.length)}%) currently hold depleted stocks.` : ""}</div>
             ${table(["Department", "Kit present?", "Stock status", "Required action"], d.first_aid.rows.map((r) => [r.department, r.kit_present ? "Yes" : "No", r.stock_status, r.required_action]), "No first aid checks recorded.")}`),
-        sec("Accident and incident management", `
+        sec("First aid given on the farm", `
+            ${d.field_first_aid.total ? `<div class="note">${d.field_first_aid.total} case${d.field_first_aid.total === 1 ? "" : "s"} recorded by first aiders. By outcome: ${d.field_first_aid.outcomes.map(([k, v]) => `${esc(k)} (${v})`).join(", ")}.</div>
+                ${table(["Department", "Cases"], d.field_first_aid.by_department.map(([k, v]) => [k, v]))}
+                ${table(["Nature", "Cases"], d.field_first_aid.by_nature.map(([k, v]) => [k, v]))}
+                ${table(["Supplies used", "Quantity"], d.field_first_aid.supplies.map((x) => [x.item, x.qty + " " + (x.uom || "")]), "No supplies recorded.")}` : '<div class="note">No first aid cases were recorded by first aiders this month.</div>'}
+            ${table(["Kit", "Department", "Supplies in kit", "Running low"], d.field_first_aid.kits.map((k) => [k.kit, k.department, k.items, k.low.join(", ") || "—"]), "No first aid kits registered.")}`),
+                sec("Accident and incident management", `
             ${table(["Date", "Type", "Employee / department", "Severity", "DOSHMIS filing"], d.incidents.map((i) => [day(i.incident_date), i.report_type + (i.injury_type ? " — " + i.injury_type : ""), [i.employee_name, i.department].filter(Boolean).join(" · "), i.severity, i.doshmis_status]), "No incidents or accidents recorded.")}
             ${d.incidents.filter((i) => i.root_cause || i.corrective_actions).map((i) => `<div class="note"><b>RCA — ${esc(day(i.incident_date))}${i.department ? ", " + esc(i.department) : ""}:</b> ${esc(i.root_cause || "")}${i.corrective_actions ? ` <b>Corrective actions:</b> ${esc(i.corrective_actions)}` : ""}</div>`).join("")}
             ${para(doc.regulatory_note)}

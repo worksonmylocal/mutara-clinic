@@ -11,6 +11,7 @@
 		"website",
 		"drug_item_group",
 		"pharmacy_warehouse",
+		"first_aid_item_group",
 		"idle_lock_minutes",
 		"section_2",
 		"po_box",
@@ -123,6 +124,14 @@
 			"label": "Lock Screen After (minutes)",
 			"default": "15",
 			"description": "Idle time before the clinic screens lock and ask for the user's PIN. 1 to 240. Applies from the next page load."
+		},
+		{
+			"fieldname": "first_aid_item_group",
+			"fieldtype": "Link",
+			"label": "First Aid Supplies Item Group",
+			"options": "Item Group",
+			"default": "First Aid Supplies",
+			"description": "Dressings and other kit supplies. These and the clinic drugs can be issued to first aid kits."
 		}
 	],
 	"links": [],

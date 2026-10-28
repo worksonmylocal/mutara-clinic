@@ -11,25 +11,40 @@ def pharmacy_warehouse():
 	return frappe.db.get_single_value("Clinic Settings", "pharmacy_warehouse")
 
 
+def main_store(company=None):
+	"""The farm's Main Store warehouse, if it has one: the clinic drugs are kept there, in the Clinic Drugs group."""
+	company = company or _company()
+	abbr = frappe.db.get_value("Company", company, "abbr") if company else None
+	name = f"Main Store - {abbr}" if abbr else None
+	return name if name and frappe.db.exists("Warehouse", name) else None
+
+
 def ensure_warehouse():
-	"""Create the clinic's own warehouse and point Clinic Settings at it (once)."""
-	if pharmacy_warehouse() and frappe.db.exists("Warehouse", pharmacy_warehouse()):
-		return pharmacy_warehouse()
-	company = frappe.defaults.get_global_default("company") or frappe.db.get_value("Company", {}, "name")
+	"""Point Clinic Settings at the warehouse that holds the clinic drugs, once.
+
+	Order: what is already set; the Main Store (drugs stay in the main store under the Clinic Drugs item group);
+	otherwise a warehouse of the clinic's own.
+	"""
+	current = pharmacy_warehouse()
+	if current and frappe.db.exists("Warehouse", current):
+		return current
+	company = _company()
 	if not company:
 		return None
-	abbr = frappe.db.get_value("Company", company, "abbr")
-	name = f"{WAREHOUSE_NAME} - {abbr}"
-	if not frappe.db.exists("Warehouse", name):
-		parent = f"All Warehouses - {abbr}"
-		frappe.get_doc(
-			{
-				"doctype": "Warehouse",
-				"warehouse_name": WAREHOUSE_NAME,
-				"company": company,
-				"parent_warehouse": parent if frappe.db.exists("Warehouse", parent) else None,
-			}
-		).insert(ignore_permissions=True)
+	name = main_store(company)
+	if not name:
+		abbr = frappe.db.get_value("Company", company, "abbr")
+		name = f"{WAREHOUSE_NAME} - {abbr}"
+		if not frappe.db.exists("Warehouse", name):
+			parent = f"All Warehouses - {abbr}"
+			frappe.get_doc(
+				{
+					"doctype": "Warehouse",
+					"warehouse_name": WAREHOUSE_NAME,
+					"company": company,
+					"parent_warehouse": parent if frappe.db.exists("Warehouse", parent) else None,
+				}
+			).insert(ignore_permissions=True)
 	frappe.db.set_single_value("Clinic Settings", "pharmacy_warehouse", name)
 	return name
 

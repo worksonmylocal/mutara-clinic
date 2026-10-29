@@ -37,8 +37,8 @@
 			"fieldtype": "Link",
 			"label": "Kit Warehouse",
 			"options": "Warehouse",
-			"read_only": 1,
-			"description": "Created automatically. The kit's supplies are stock in this warehouse."
+			"read_only": 0,
+			"description": "Created automatically. If that is not possible on this site, create a warehouse for the kit and select it here."
 		},
 		{
 			"fieldname": "active",

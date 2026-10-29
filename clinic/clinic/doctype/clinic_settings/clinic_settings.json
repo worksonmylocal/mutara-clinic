@@ -11,6 +11,7 @@
 		"website",
 		"drug_item_group",
 		"pharmacy_warehouse",
+		"cost_center",
 		"first_aid_item_group",
 		"idle_lock_minutes",
 		"section_2",
@@ -132,6 +133,13 @@
 			"options": "Item Group",
 			"default": "First Aid Supplies",
 			"description": "Dressings and other kit supplies. These and the clinic drugs can be issued to first aid kits."
+		},
+		{
+			"fieldname": "cost_center",
+			"fieldtype": "Link",
+			"label": "Cost Centre for Stock Entries",
+			"options": "Cost Center",
+			"description": "Used for the stock entries the clinic creates. Leave empty to use 'Clinic - <company abbreviation>' or the company default."
 		}
 	],
 	"links": [],

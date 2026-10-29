@@ -91,12 +91,14 @@ def issue_dispensed(dispensing):
 	warehouse = pharmacy_warehouse()
 	if not warehouse:
 		frappe.throw(_("Set the Pharmacy Warehouse in Clinic Settings first"))
+	company = frappe.db.get_value("Warehouse", warehouse, "company")
+	defaults = {k: v for k, v in accounting_defaults(company).items() if v}
 	entry = frappe.get_doc(
 		{
 			"doctype": "Stock Entry",
 			"stock_entry_type": "Material Issue",
 			"purpose": "Material Issue",
-			"company": frappe.db.get_value("Warehouse", warehouse, "company"),
+			"company": company,
 			"posting_date": nowdate(),
 			"posting_time": nowtime(),
 			"remarks": _("Dispensed at the clinic: {0} ({1})").format(dispensing.name, dispensing.patient_name),
@@ -106,6 +108,7 @@ def issue_dispensed(dispensing):
 					"s_warehouse": warehouse,
 					"qty": flt(r.dispensed_qty),
 					"uom": frappe.db.get_value("Item", r.drug, "stock_uom"),
+					**defaults,
 				}
 				for r in lines
 			],
@@ -147,6 +150,7 @@ def add_opening_stock(quantity=100, rate=10):
 					"qty": flt(quantity),
 					"basic_rate": flt(rate),
 					"uom": frappe.db.get_value("Item", i, "stock_uom"),
+					**{k: v for k, v in accounting_defaults(frappe.db.get_value("Warehouse", warehouse, "company")).items() if v},
 				}
 				for i in items
 			],
@@ -166,7 +170,21 @@ def _company():
 
 
 def ensure_kit_warehouse(kit_name):
-	"""A warehouse per kit, under a 'First Aid Kits' group warehouse, so each kit's supplies are real stock."""
+	"""A warehouse per kit, under a 'First Aid Kits' group warehouse, so each kit's supplies are real stock.
+
+	Farms whose Warehouse form has extra mandatory fields (e.g. a Farm) cannot have it created automatically:
+	create the warehouse by hand and pick it on the kit."""
+	try:
+		return _create_kit_warehouse(kit_name)
+	except frappe.MandatoryError as e:
+		frappe.throw(
+			_("The kit's warehouse could not be created automatically ({0}). Create a warehouse for this kit and select it in the Kit Warehouse field.").format(
+				frappe.utils.strip_html(str(e))
+			)
+		)
+
+
+def _create_kit_warehouse(kit_name):
 	company = _company()
 	abbr = frappe.db.get_value("Company", company, "abbr")
 	root = f"All Warehouses - {abbr}"
@@ -197,13 +215,25 @@ def supply_groups():
 	return list(set(drug_groups()) | {group})
 
 
+def accounting_defaults(company):
+	"""Cost centre and expense account for stock entries. Some farms have no default cost centre on the company,
+	so the clinic's own cost centre (Clinic Settings, or one called 'Clinic - <abbr>') is used."""
+	abbr, default_cc, adjustment = frappe.db.get_value("Company", company, ["abbr", "cost_center", "stock_adjustment_account"])
+	cost_center = frappe.db.get_single_value("Clinic Settings", "cost_center")
+	if not cost_center and frappe.db.exists("Cost Center", f"Clinic - {abbr}"):
+		cost_center = f"Clinic - {abbr}"
+	return {"cost_center": cost_center or default_cc, "expense_account": adjustment}
+
+
 def _entry(doc, entry_type, source, target, rows, remarks):
+	company = frappe.db.get_value("Warehouse", source or target, "company")
+	defaults = {k: v for k, v in accounting_defaults(company).items() if v}
 	entry = frappe.get_doc(
 		{
 			"doctype": "Stock Entry",
 			"stock_entry_type": entry_type,
 			"purpose": entry_type,
-			"company": frappe.db.get_value("Warehouse", source or target, "company"),
+			"company": company,
 			"posting_date": nowdate(),
 			"posting_time": nowtime(),
 			"remarks": remarks,
@@ -214,6 +244,7 @@ def _entry(doc, entry_type, source, target, rows, remarks):
 					"t_warehouse": target,
 					"qty": flt(r.qty),
 					"uom": frappe.db.get_value("Item", r.item, "stock_uom"),
+					**defaults,
 				}
 				for r in rows
 			],
